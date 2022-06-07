@@ -53,17 +53,45 @@ extension Optional {
 
   /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
   @inlinable
-  public func assign<T>(
-    to keyPath: ReferenceWritableKeyPath<T, Wrapped>,
-    on target: T
-  ) { map { target[keyPath: keyPath] = $0 } }
-
-  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
-  @inlinable
-  public func assign<T>(
+  public func assign<T: AnyObject>(
     to keyPath: ReferenceWritableKeyPath<T, Optional>,
     on target: T
   ) { target[keyPath: keyPath] = self }
+  
+  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  @inlinable
+  public func ifLetAssign<T: AnyObject>(
+    to keyPath: ReferenceWritableKeyPath<T, Wrapped>,
+    on target: T
+  ) { map { target[keyPath: keyPath] = $0 } }
+  
+  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  @inlinable
+  public func ifLetAssign<T: AnyObject>(
+    to keyPath: ReferenceWritableKeyPath<T, Optional>,
+    on target: T
+  ) { map { target[keyPath: keyPath] = $0 } }
+  
+  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  @inlinable
+  public func assign<T>(
+    to keyPath: WritableKeyPath<T, Optional>,
+    on target: inout T
+  ) { target[keyPath: keyPath] = self }
+  
+  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  @inlinable
+  public func ifLetAssign<T>(
+    to keyPath: WritableKeyPath<T, Wrapped>,
+    on target: inout T
+  ) { map { target[keyPath: keyPath] = $0 } }
+  
+  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  @inlinable
+  public func ifLetAssign<T>(
+    to keyPath: WritableKeyPath<T, Optional>,
+    on target: inout T
+  ) { map { target[keyPath: keyPath] = $0 } }
 }
 
 extension Optional where Wrapped: Collection {
