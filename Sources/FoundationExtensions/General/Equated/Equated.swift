@@ -9,15 +9,15 @@ import Foundation
 
 @propertyWrapper
 public struct Equated<Value>: Equatable {
-  public init<T>(compare comparator: Comparator) where Value == T? {
-    self.init(.none, compare: comparator)
+  public init<T>(by comparator: Comparator) where Value == T? {
+    self.init(.none, by: comparator)
   }
   
-  public init(_ wrappedValue: Value, compare comparator: Comparator) {
-    self.init(wrappedValue: wrappedValue, compare: comparator)
+  public init(_ wrappedValue: Value, by comparator: Comparator) {
+    self.init(wrappedValue: wrappedValue, by: comparator)
   }
 
-  public init(wrappedValue: Value, compare comparator: Comparator) {
+  public init(wrappedValue: Value, by comparator: Comparator) {
     self.wrappedValue = wrappedValue
     self.comparator = comparator
   }
@@ -37,7 +37,7 @@ extension Equated where Value: Equatable {
   }
   
   public init(wrappedValue: Value) {
-    self.init(wrappedValue: wrappedValue, compare: .custom(==))
+    self.init(wrappedValue, by: .custom(==))
   }
 }
 
@@ -49,7 +49,7 @@ extension Equated: Error where Value: Error {
   public init(wrappedValue: Value) {
     self.init(
       wrappedValue: wrappedValue,
-      compare: .localizedDescription
+      by: .localizedDescription
     )
   }
   
