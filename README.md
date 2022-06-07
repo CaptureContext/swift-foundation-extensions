@@ -4,7 +4,7 @@
 
 Standard extensions for Foundation
 
-> NOTE: The package is early beta
+> NOTE: The package is in beta (feel free suggest your improvements [here](https://github.com/capturecontext/swift-foundation-extensions/discussions/1))
 
 
 
