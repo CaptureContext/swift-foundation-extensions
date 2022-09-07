@@ -1,6 +1,6 @@
 # swift-foundation-extensions
 
-[![SwiftPM 5.3](https://img.shields.io/badge/swiftpm-5.3-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@maximkrouk](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
+[![SwiftPM 5.6](https://img.shields.io/badge/swiftpm-5.6-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@maximkrouk](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
 
 Standard extensions for Foundation
 
@@ -26,7 +26,7 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 .package(
   name: "swift-foundation-extensions",
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .branch("main")
+  .upToNextMinor(from: "0.1.0")
 )
 ```
 

@@ -21,21 +21,23 @@ final class CodingKeysTests: XCTestCase {
     var boolValue: Bool = false
     
     init(from decoder: Decoder) throws {
-      let container = try decoder.container(keyedBy: FoundationExtensions.CodingKeys.self)
-      self.init(
-        optionalValue: try container.decodeIfPresent(Int.self, forKey: "optionalValue"),
-        integerValue: try container.decode(Int.self, forKey: "integerValue"),
-        stringValue: try container.decode(String.self, forKey: "stringValue"),
-        boolValue: try container.decode(Bool.self, forKey: "boolValue")
-      )
+      self = try decoder.decode { container in
+        return .init(
+          optionalValue: try container.decodeIfPresent("optionalValue"),
+          integerValue: try container.decode("integerValue"),
+          stringValue: try container.decode("stringValue"),
+          boolValue: try container.decode("boolValue")
+        )
+      }
     }
     
     func encode(to encoder: Encoder) throws {
-      var container = encoder.container(keyedBy: FoundationExtensions.CodingKeys.self)
-      try container.encodeIfPresent(optionalValue, forKey: "optionalValue")
-      try container.encode(integerValue, forKey: "integerValue")
-      try container.encode(stringValue, forKey: "stringValue")
-      try container.encode(boolValue, forKey: "boolValue")
+      try encoder.encode { container in
+        try container.encodeIfPresent(optionalValue, forKey: "optionalValue")
+        try container.encode(integerValue, forKey: "integerValue")
+        try container.encode(stringValue, forKey: "stringValue")
+        try container.encode(boolValue, forKey: "boolValue")
+      }
     }
   }
   
@@ -66,8 +68,9 @@ final class CodingKeysTests: XCTestCase {
     var value: Int
     
     init(from decoder: Decoder) throws {
-      let container = try decoder.container(keyedBy: FoundationExtensions.CodingKeys.self)
-      self.init(value: try container.decode(Int.self, forKey: "integerValue"))
+      self = try decoder.decode { container in
+        return try container.decode("integerValue")
+      }
     }
   }
   
@@ -92,14 +95,14 @@ final class CodingKeysTests: XCTestCase {
     if #available(iOS 11.0, tvOS 11.0, *) {
       XCTAssertEqual(
         try XCTUnwrap(String(data: encodedData, encoding: .utf8)),
-      """
-      {
-        "boolValue" : true,
-        "integerValue" : 2,
-        "optionalValue" : 1,
-        "stringValue" : "test"
-      }
-      """
+        """
+        {
+          "boolValue" : true,
+          "integerValue" : 2,
+          "optionalValue" : 1,
+          "stringValue" : "test"
+        }
+        """
       )
     }
     
