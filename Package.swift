@@ -18,12 +18,10 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      name: "swift-declarative-configuration",
       url: "https://github.com/capturecontext/swift-declarative-configuration.git",
       .upToNextMinor(from: "0.3.0")
     ),
     .package(
-      name: "swift-custom-dump",
       url: "https://github.com/pointfreeco/swift-custom-dump",
       .upToNextMajor(from: "0.3.0")
     ),
