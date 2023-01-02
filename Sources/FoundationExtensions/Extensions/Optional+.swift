@@ -51,7 +51,7 @@ extension Optional {
     }
   }
 
-  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  /// Assigns wrapped value to a specified target property by the keyPath
   @inlinable
   public func assign<T: AnyObject>(
     to keyPath: ReferenceWritableKeyPath<T, Optional>,
@@ -72,7 +72,7 @@ extension Optional {
     on target: T
   ) { map { target[keyPath: keyPath] = $0 } }
   
-  /// Assigns wrapped value to a specified target property by the keyPath if an optional was not nil
+  /// Assigns wrapped value to a specified target property by the keyPath
   @inlinable
   public func assign<T>(
     to keyPath: WritableKeyPath<T, Optional>,
