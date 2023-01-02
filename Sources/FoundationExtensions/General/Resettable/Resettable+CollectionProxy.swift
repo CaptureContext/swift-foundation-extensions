@@ -17,6 +17,15 @@ extension Resettable where Object: Collection {
 
 extension Resettable {
   public struct WritableCollectionProxy<Collection> where Collection: Swift.Collection {
+    @usableFromInline
+    internal init(
+      resettable: Resettable<Object>,
+      keyPath: FunctionalKeyPath<Object, Collection>
+    ) {
+      self.resettable = resettable
+      self.keyPath = keyPath
+    }
+
     var resettable: Resettable
     var keyPath: FunctionalKeyPath<Object, Collection>
     
@@ -45,6 +54,15 @@ extension Resettable {
   }
   
   public struct CollectionProxy<Collection> where Collection: Swift.Collection {
+    @usableFromInline
+    internal init(
+      resettable: Resettable<Object>,
+      keyPath: FunctionalKeyPath<Object, Collection>
+    ) {
+      self.resettable = resettable
+      self.keyPath = keyPath
+    }
+
     var resettable: Resettable
     var keyPath: FunctionalKeyPath<Object, Collection>
     

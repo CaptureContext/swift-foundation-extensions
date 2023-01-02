@@ -7,6 +7,15 @@ extension Resettable {
      message: "Might be removed due to Value type constraint, which makes the behavior unstable, consider re-implementing this feature locally if you need"
   )
   public struct ValuesDump {
+    @usableFromInline
+    internal init(
+      items: [Object],
+      currentIndex: Int
+    ) {
+      self.items = items
+      self.currentIndex = currentIndex
+    }
+
     public let items: [Object]
     public let currentIndex: Int
   }
@@ -24,16 +33,23 @@ extension Resettable {
 @propertyWrapper
 @dynamicMemberLookup
 public class Resettable<Object> {
+  @inlinable
   public init(_ object: Object) {
     self.object = object
     self.pointer = Pointer(undo: nil, redo: nil)
   }
-  
-  private var object: Object
+
+  @usableFromInline
+  internal var object: Object
+
+  @inlinable
   public var wrappedValue: Object { object }
+
+  @inlinable
   public var projectedValue: Resettable { self }
-  
-  private var pointer: Pointer
+
+  @usableFromInline
+  internal var pointer: Pointer
   
   // MARK: - Undo/Redo
   
@@ -42,6 +58,7 @@ public class Resettable<Object> {
     *, deprecated,
      message: "Might be removed due to Value type constraint, which makes the behavior unstable, consider re-implementing this feature locally if you need"
   )
+  @inlinable
   public func valuesDump() -> ValuesDump {
     let _pointer = pointer
     while pointer !== undo().pointer {}
@@ -62,13 +79,15 @@ public class Resettable<Object> {
     
     return ValuesDump(items: buffer, currentIndex: currentIndex)
   }
-  
+
+  @inlinable
   public func dump() -> String {
     var buffer = ""
     self.dump(to: &buffer)
     return buffer
   }
-  
+
+  @inlinable
   public func dump<TargetStream: TextOutputStream>(
     to stream: inout TargetStream
   ) {
@@ -118,36 +137,42 @@ public class Resettable<Object> {
   }
   
   @discardableResult
+  @inlinable
   public func undo() -> Resettable {
     pointer = pointer.undo(&object)
     return self
   }
   
   @discardableResult
+  @inlinable
   public func redo() -> Resettable {
     pointer = pointer.redo(&object)
     return self
   }
   
   @discardableResult
+  @inlinable
   public func undo(_ count: Int) -> Resettable {
     for _ in 0..<count { undo() }
     return self
   }
   
   @discardableResult
+  @inlinable
   public func redo(_ count: Int) -> Resettable {
     for _ in 0..<count { redo() }
     return self
   }
   
   @discardableResult
+  @inlinable
   public func reset() -> Resettable {
     while pointer !== undo().pointer {}
     return self
   }
   
   @discardableResult
+  @inlinable
   public func restore() -> Resettable {
     while pointer !== redo().pointer {}
     return self
@@ -156,7 +181,8 @@ public class Resettable<Object> {
   // MARK: - Unsafe modification
   
   @discardableResult
-  private func __modify(
+  @usableFromInline
+  internal func __modify(
     _ nextPointer: () -> Pointer
   ) -> Resettable {
     self.pointer = nextPointer()
@@ -164,6 +190,7 @@ public class Resettable<Object> {
   }
   
   @discardableResult
+  @inlinable
   public func _modify<Value>(
     operation: OperationBehavior = .default,
     _ keyPath: FunctionalKeyPath<Object, Value>,
@@ -179,6 +206,7 @@ public class Resettable<Object> {
   }
   
   @discardableResult
+  @inlinable
   public func _modify<Value>(
     operation: OperationBehavior = .default,
     _ keyPath: FunctionalKeyPath<Object, Value>,
@@ -196,6 +224,7 @@ public class Resettable<Object> {
   }
   
   @discardableResult
+  @inlinable
   public func _modify(
     operation: OperationBehavior = .default,
     using action: @escaping (inout Object) -> Void,
@@ -214,7 +243,8 @@ public class Resettable<Object> {
   // MARK: - DynamicMemberLookup
   
   // MARK: Default
-  
+
+  @inlinable
   public subscript<Value>(
     dynamicMember keyPath: WritableKeyPath<Object, Value>
   ) -> WritableKeyPathContainer<Value> {
@@ -223,7 +253,8 @@ public class Resettable<Object> {
       keyPath: .init(keyPath)
     )
   }
-  
+
+  @inlinable
   public subscript<Value>(
     dynamicMember keyPath: KeyPath<Object, Value>
   ) -> KeyPathContainer<Value> {
@@ -234,7 +265,8 @@ public class Resettable<Object> {
   }
   
   // MARK: Optional
-  
+
+  @inlinable
   public subscript<Value, Wrapped>(
     dynamicMember keyPath: WritableKeyPath<Wrapped, Value>
   ) -> WritableKeyPathContainer<Value?> where Object == Optional<Wrapped> {
@@ -243,7 +275,8 @@ public class Resettable<Object> {
       keyPath: FunctionalKeyPath(keyPath).optional()
     )
   }
-  
+
+  @inlinable
   public subscript<Value, Wrapped>(
     dynamicMember keyPath: KeyPath<Wrapped, Value>
   ) -> KeyPathContainer<Value?> where Object == Optional<Wrapped> {
@@ -254,7 +287,8 @@ public class Resettable<Object> {
   }
   
   // MARK: Collection
-  
+
+  @inlinable
   public subscript<Value>(
     dynamicMember keyPath: WritableKeyPath<Object, Value>
   ) -> WritableCollectionProxy<Value> where Value: Swift.Collection {
@@ -263,7 +297,8 @@ public class Resettable<Object> {
       keyPath: .init(keyPath)
     )
   }
-  
+
+  @inlinable
   public subscript<Value>(
     dynamicMember keyPath: KeyPath<Object, Value>
   ) -> CollectionProxy<Value> where Value: Swift.Collection {
@@ -277,7 +312,9 @@ public class Resettable<Object> {
 // MARK: - Undo/Redo Core
 
 extension Resettable {
-  private class Pointer {
+  @usableFromInline
+  internal class Pointer {
+    @usableFromInline
     init(
       prev: Pointer? = nil,
       next: Pointer? = nil,
@@ -289,26 +326,36 @@ extension Resettable {
       self._undo = undo
       self._redo = redo
     }
-    
+
+    @usableFromInline
     var prev: Pointer?
+
+    @usableFromInline
     var next: Pointer?
+
+    @usableFromInline
     var _undo: ((inout Object) -> Void)?
+
+    @usableFromInline
     var _redo: ((inout Object) -> Void)?
     
     // MARK: - Undo/Redo
-    
+
+    @usableFromInline
     func undo(_ object: inout Object) -> Pointer {
       _undo?(&object)
       return prev.or(self)
     }
-    
+
+    @usableFromInline
     func redo(_ object: inout Object) -> Pointer {
       _redo?(&object)
       return next.or(self)
     }
     
     // MARK: - Apply
-    
+
+    @usableFromInline
     func apply<Value>(
       modification action: @escaping (inout Value) -> Void,
       for object: inout Object,
@@ -330,7 +377,8 @@ extension Resettable {
         didPrepareObjectForAmend: didPrepareObjectForAmend
       )
     }
-    
+
+    @usableFromInline
     func apply<Value>(
       modification action: @escaping (inout Value) -> Void,
       for object: inout Object,
@@ -363,7 +411,8 @@ extension Resettable {
         didPrepareObjectForAmend: didPrepareObjectForAmend
       )
     }
-    
+
+    @usableFromInline
     func apply(
       modification: @escaping (inout Object) -> Void,
       undo: @escaping (inout Object) -> Void,
@@ -420,13 +469,26 @@ extension Resettable {
 extension Resettable {
   @dynamicMemberLookup
   public struct KeyPathContainer<Value> {
+    @usableFromInline
+    internal init(
+      resettable: Resettable<Object>,
+      keyPath: FunctionalKeyPath<Object, Value>
+    ) {
+      self.resettable = resettable
+      self.keyPath = keyPath
+    }
+
+    @usableFromInline
     let resettable: Resettable
+
+    @usableFromInline
     let keyPath: FunctionalKeyPath<Object, Value>
     
     // MARK: - DynamicMemberLookup
     
     // MARK: Default
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: ReferenceWritableKeyPath<Value, LocalValue>
     ) -> WritableKeyPathContainer<LocalValue> {
@@ -435,7 +497,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: KeyPath<Value, LocalValue>
     ) -> KeyPathContainer<LocalValue> {
@@ -446,7 +509,8 @@ extension Resettable {
     }
     
     // MARK: Optional
-    
+
+    @inlinable
     public subscript<LocalValue, Wrapped>(
       dynamicMember keyPath: ReferenceWritableKeyPath<Wrapped, LocalValue>
     ) -> WritableKeyPathContainer<LocalValue?> where Value == Optional<Wrapped> {
@@ -455,7 +519,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue, Wrapped>(
       dynamicMember keyPath: KeyPath<Wrapped, LocalValue>
     ) -> KeyPathContainer<LocalValue?> where Value == Optional<Wrapped> {
@@ -466,7 +531,8 @@ extension Resettable {
     }
     
     // MARK: Collection
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: ReferenceWritableKeyPath<Value, LocalValue>
     ) -> WritableCollectionProxy<LocalValue> where LocalValue: Swift.Collection {
@@ -475,7 +541,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: KeyPath<Value, LocalValue>
     ) -> CollectionProxy<LocalValue> where LocalValue: Swift.Collection {
@@ -488,22 +555,37 @@ extension Resettable {
   
   @dynamicMemberLookup
   public struct WritableKeyPathContainer<Value> {
+    @usableFromInline
+    internal init(
+      resettable: Resettable<Object>,
+      keyPath: FunctionalKeyPath<Object, Value>
+    ) {
+      self.resettable = resettable
+      self.keyPath = keyPath
+    }
+
+    @usableFromInline
     let resettable: Resettable
+
+    @usableFromInline
     let keyPath: FunctionalKeyPath<Object, Value>
     
     // MARK: Modification
     
     @discardableResult
+    @inlinable
     public func callAsFunction(_ value: Value, operation: OperationBehavior = .default) -> Resettable {
       return self.callAsFunction(operation) { $0 = value }
     }
     
     @discardableResult
+    @inlinable
     public func callAsFunction(_ operation: OperationBehavior = .default, _ action: @escaping (inout Value) -> Void) -> Resettable {
       return resettable._modify(operation: operation, keyPath, using: action)
     }
     
     @discardableResult
+    @inlinable
     public func callAsFunction(
       _ operation: OperationBehavior = .default,
       _ action: @escaping (inout Value) -> Void,
@@ -516,7 +598,8 @@ extension Resettable {
     // MARK: - DynamicMemberLookup
     
     // MARK: Default
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: WritableKeyPath<Value, LocalValue>
     ) -> WritableKeyPathContainer<LocalValue> {
@@ -525,7 +608,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: KeyPath<Value, LocalValue>
     ) -> KeyPathContainer<LocalValue> {
@@ -536,7 +620,8 @@ extension Resettable {
     }
     
     // MARK: Optional
-    
+
+    @inlinable
     public subscript<LocalValue, Wrapped>(
       dynamicMember keyPath: WritableKeyPath<Wrapped, LocalValue>
     ) -> WritableKeyPathContainer<LocalValue?> where Value == Optional<Wrapped> {
@@ -545,7 +630,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue, Wrapped>(
       dynamicMember keyPath: KeyPath<Wrapped, LocalValue>
     ) -> KeyPathContainer<LocalValue?> where Value == Optional<Wrapped> {
@@ -556,7 +642,8 @@ extension Resettable {
     }
     
     // MARK: Collection
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: WritableKeyPath<Value, LocalValue>
     ) -> WritableCollectionProxy<LocalValue> where LocalValue: Swift.Collection {
@@ -565,7 +652,8 @@ extension Resettable {
         keyPath: self.keyPath.appending(path: .init(keyPath))
       )
     }
-    
+
+    @inlinable
     public subscript<LocalValue>(
       dynamicMember keyPath: KeyPath<Value, LocalValue>
     ) -> CollectionProxy<LocalValue> where LocalValue: Swift.Collection {
@@ -578,7 +666,7 @@ extension Resettable {
 }
 
 @discardableResult
-fileprivate func modification<T>(
+internal func modification<T>(
   of object: T,
   with action: (inout T) -> Void
 ) -> T {
