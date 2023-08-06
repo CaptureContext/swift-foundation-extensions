@@ -1,11 +1,3 @@
-//
-//  Collection+Extension.swift
-//  AthenaMacOS
-//
-//  Created by Maxim Krouk on 7/19/20.
-//  Copyright © 2020 dev.makeupstudio. All rights reserved.
-//
-
 extension Collection {
   /// - Complexity: *O(1)*
   @inlinable

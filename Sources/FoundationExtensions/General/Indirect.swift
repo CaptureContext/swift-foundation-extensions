@@ -1,11 +1,3 @@
-//
-//  Indirect.swift
-//  EduDoCore
-//
-//  Created by Maxim Krouk on 9/8/20.
-//  Copyright © 2020 EduDo Inc. All rights reserved.
-//
-
 import Foundation
 
 /// CoW container, that allows you to wrap structs recoursively
