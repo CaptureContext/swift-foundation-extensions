@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.8
 
 import PackageDescription
 
@@ -23,7 +23,7 @@ let package = Package(
     ),
     .package(
       url: "https://github.com/pointfreeco/swift-custom-dump",
-      .upToNextMajor(from: "0.6.1")
+      .upToNextMajor(from: "1.0.0")
     ),
   ],
   targets: [
