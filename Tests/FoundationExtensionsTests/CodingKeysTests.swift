@@ -68,7 +68,7 @@ final class CodingKeysTests: XCTestCase {
     var value: Int
     
     init(from decoder: Decoder) throws {
-      self = try decoder.decode { container in
+      self.value = try decoder.decode { container in
         return try container.decode("integerValue")
       }
     }
