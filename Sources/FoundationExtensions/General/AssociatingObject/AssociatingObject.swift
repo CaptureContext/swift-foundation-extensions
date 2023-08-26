@@ -22,7 +22,7 @@ extension AssociatingObject {
   public func setAssociatedObject<Object>(
     _ object: Object,
     forKey key: StaticString,
-    policy: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+    policy: objc_AssociationPolicy = .retain(.nonatomic)
   ) -> Bool {
     return _setAssociatedObject(
       object,
@@ -50,9 +50,28 @@ public func _setAssociatedObject<Object>(
   _ object: Object,
   to associatingObject: AnyObject,
   forKey key: StaticString,
-  policy: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+  threadSafety: _AssociationPolicyThreadSafety = .nonatomic
 ) -> Bool {
-  key.withUTF8Buffer { pointer in
+  _setAssociatedObject(
+    object,
+    to: associatingObject,
+    forKey: key,
+    policy: .init(
+      object is AnyClass ? .retain : .copy,
+      threadSafety
+    )
+  )
+}
+
+@inlinable
+@discardableResult
+public func _setAssociatedObject<Object>(
+  _ object: Object,
+  to associatingObject: AnyObject,
+  forKey key: StaticString,
+  policy: objc_AssociationPolicy
+) -> Bool {
+  return key.withUTF8Buffer { pointer in
     if let p = pointer.baseAddress.map(UnsafeRawPointer.init) {
       objc_setAssociatedObject(associatingObject, p, object, policy)
       return true

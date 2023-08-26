@@ -3,15 +3,34 @@ import XCTest
 
 final class AssociatingObjectTests: XCTestCase {
   func testMain() {
+    struct Struct: Equatable {
+      var value: Int
+    }
     class CustomObject {}
     class CustomNSObject: NSObject {}
-    class CustomAssociatingObject: AssociatingObject {}
-    
+    class CustomAssociatingObject: AssociatingObject {
+      var _struct: Struct {
+        get { getAssociatedObject(forKey: #function).or(.init(value: 0)) }
+        set { setAssociatedObject(newValue, forKey: #function)}
+      }
+    }
+
     let nsObject = NSObject()
     let customObject = CustomObject()
     let customNSObject = CustomNSObject()
     let customAssociatingObject = CustomAssociatingObject()
-    
+
+    // simple check for struct storage
+    XCTAssertEqual(customAssociatingObject._struct, .init(value: 0))
+
+    customAssociatingObject._struct.value = 1
+    XCTAssertEqual(customAssociatingObject._struct, .init(value: 1))
+
+    nsObject.setAssociatedObject(91, forKey: "value")
+    customNSObject.setAssociatedObject(92, forKey: "value")
+    customAssociatingObject.setAssociatedObject(93, forKey: "value")
+    _setAssociatedObject(94, to: customObject, forKey: "value")
+
     // check if set overrides values on different objects
     
     nsObject.setAssociatedObject(91, forKey: "value")
