@@ -1,5 +1,3 @@
-import FoundationExtensionsMacros
-
 @attached(accessor)
 public macro AssociatedObject(
   _ policy: objc_AssociationPolicy

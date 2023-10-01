@@ -16,7 +16,7 @@ let package = Package(
     .library(
       name: "FoundationExtensions",
       targets: ["FoundationExtensions"]
-    )
+    ),
   ],
   dependencies: [
     .package(

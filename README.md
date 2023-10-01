@@ -133,7 +133,7 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 .package(
   name: "swift-foundation-extensions",
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  branch: "swift-macros"
+  .upToNextMinor(from: "0.3.1")
 )
 ```
 
