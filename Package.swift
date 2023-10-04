@@ -28,17 +28,13 @@ let package = Package(
       .upToNextMajor(from: "1.0.0")
     ),
     .package(
-      url: "https://github.com/maximkrouk/swift-macro-toolkit.git",
+      url: "https://github.com/stackotter/swift-macro-toolkit.git",
       .upToNextMinor(from: "0.3.0")
     ),
     .package(
       url: "https://github.com/pointfreeco/swift-macro-testing.git",
       .upToNextMinor(from: "0.1.0")
-    ),
-    .package(
-      url: "https://github.com/apple/swift-syntax.git",
-      exact: "509.0.0"
-    ),
+    )
   ],
   targets: [
     .target(
