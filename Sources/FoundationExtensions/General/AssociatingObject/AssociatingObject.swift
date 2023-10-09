@@ -57,7 +57,7 @@ public func _setAssociatedObject<Object>(
     to: associatingObject,
     forKey: key,
     policy: .init(
-      object is AnyClass ? .retain : .copy,
+      Object.self is AnyClass ? .retain : .copy,
       threadSafety
     )
   )

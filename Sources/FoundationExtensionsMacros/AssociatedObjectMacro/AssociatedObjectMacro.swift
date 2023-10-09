@@ -106,7 +106,7 @@ public struct AssociatedObjectMacro: AccessorMacro {
       }
 
     default:
-      return context.diagnose(.unexpectedArguments(node), return: [])
+      return context.diagnose(.unexpectedArguments(decl._syntax), return: [])
     }
 
     let getter: CodeBlockSyntax = if let initialValue = binding.initialValue {
@@ -218,8 +218,8 @@ fileprivate extension Diagnostic {
       .build()
   }
 
-  static func unexpectedArguments(_ node: AttributeSyntax) -> Self {
-    DiagnosticBuilder(for: node)
+  static func unexpectedArguments(_ node: VariableDeclSyntax) -> Self {
+    return DiagnosticBuilder(for: node)
       .messageID(domain: "AssociatedObject", id: "unexpected_number_of_args")
       .message(
           """
@@ -228,16 +228,44 @@ fileprivate extension Diagnostic {
           """
       )
       .suggestReplacement(
-        "Replace arguments",
-        old: node,
-        new: AttributeSyntax("AssociatedObject", argumentList: {
-          .init(expression: ExprSyntax(literal: "<#AssociationPolicy#>"))
-        })
-      )
-      .suggestReplacement(
         "Remove arguments",
         old: node,
-        new: AttributeSyntax("AssociatedObject")
+        new: {
+          var suggestion = node.detached
+          suggestion.attributes = .init(suggestion.attributes.map { attribute in
+            guard
+              case var .attribute(attribute) = attribute,
+              attribute.attributeName.description == "AssociatedObject"
+            else { return attribute }
+
+            attribute.arguments = nil
+            attribute.leftParen = nil
+            attribute.rightParen = nil
+
+            return .attribute(attribute)
+          })
+          return suggestion
+        }()
+      )
+      .suggestReplacement(
+        "Replace arguments",
+        old: node,
+        new: {
+          var suggestion = node.detached
+          suggestion.attributes = .init(suggestion.attributes.map { attribute in
+            guard
+              case var .attribute(attribute) = attribute,
+              attribute.attributeName.description == "AssociatedObject"
+            else { return attribute }
+
+            attribute.arguments = .argumentList(.init {
+              .init(expression: ExprSyntax(stringLiteral: "<#AssociationPolicy#>"))
+            })
+
+            return .attribute(attribute)
+          })
+          return suggestion
+        }()
       )
       .build()
   }
