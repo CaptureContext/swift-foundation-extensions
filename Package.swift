@@ -33,7 +33,7 @@ let package = Package(
     ),
     .package(
       url: "https://github.com/pointfreeco/swift-macro-testing.git",
-      .upToNextMinor(from: "0.1.0")
+      .upToNextMinor(from: "0.2.0")
     )
   ],
   targets: [

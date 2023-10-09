@@ -22,7 +22,7 @@ final class AssociatedObjectTests: XCTestCase {
           let value: Int = 0
         }
         """
-    } matches: {
+    } diagnostics: {
       """
       extension Object {
         @AssociatedObject
@@ -41,7 +41,7 @@ final class AssociatedObjectTests: XCTestCase {
           var value = 0
         }
         """
-    } matches: {
+    } diagnostics: {
       """
       extension Object {
         @AssociatedObject
@@ -60,7 +60,7 @@ final class AssociatedObjectTests: XCTestCase {
           var value: Int
         }
         """
-    } matches: {
+    } diagnostics: {
       """
       extension Object {
         @AssociatedObject
@@ -79,7 +79,7 @@ final class AssociatedObjectTests: XCTestCase {
           var value: Int = 0
         }
         """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int = 0 {
@@ -112,7 +112,7 @@ final class AssociatedObjectTests: XCTestCase {
         var value: Int?
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -147,7 +147,7 @@ final class AssociatedObjectTests: XCTestCase {
         var value: Int?
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -194,13 +194,42 @@ final class AssociatedObjectTests: XCTestCase {
         var value: Int?
       }
       """
-    } matches: {
+    } diagnostics: {
       """
       extension Object {
         @AssociatedObject(.copy, .nonatomic)
         ╰─ 🛑 [internal] `@AssociatedObject` received unexpected args, submit an issue here: https://github.com/capturecontext/swift-foundation-extensions
-           ✏️ Replace arguments  │      ✏️ Remove arguments
+           ✏️ Remove arguments  │      ✏️ Replace arguments
         var value: Int?
+      }
+      """
+    } fixes: {
+      """
+      extension Object {
+        @AssociatedObject
+        var value: Int?
+      }
+      """
+    } expansion: {
+      """
+      extension Object {
+        var value: Int? {
+          get {
+            return _getAssociatedObject(
+              forKey: #function,
+              from: self
+            )
+          }
+          set {
+            do {
+              _setAssociatedObject(
+                newValue,
+                to: self,
+                forKey: #function
+              )
+            }
+          }
+        }
       }
       """
     }
@@ -214,7 +243,7 @@ final class AssociatedObjectTests: XCTestCase {
         var value: Int?
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -259,7 +288,7 @@ final class AssociatedObjectTests: XCTestCase {
         var value: Int?
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -306,13 +335,22 @@ final class AssociatedObjectTests: XCTestCase {
         }
       }
       """
-    } matches: {
+    } diagnostics: {
       """
       extension Object {
         @AssociatedObject
         var value: Int? {
             ╰─ 🛑 `@AssociatedObject` does not support custom `set` accessors
                ✏️ Use `didSet` instead
+          set { print(newValue) }
+        }
+      }
+      """
+    } fixes: {
+      """
+      extension Object {
+        @AssociatedObject
+        var value: Int? {
           set { print(newValue) }
         }
       }
@@ -331,7 +369,7 @@ final class AssociatedObjectTests: XCTestCase {
         }
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -378,7 +416,7 @@ final class AssociatedObjectTests: XCTestCase {
         }
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int? {
@@ -426,7 +464,7 @@ final class AssociatedObjectTests: XCTestCase {
         }
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int = 0 {
@@ -473,7 +511,7 @@ final class AssociatedObjectTests: XCTestCase {
         }
       }
       """
-    } matches: {
+    } expansion: {
       """
       extension Object {
         var value: Int = 0 {
