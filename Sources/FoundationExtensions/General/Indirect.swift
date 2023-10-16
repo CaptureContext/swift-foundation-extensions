@@ -1,6 +1,6 @@
 import Foundation
 
-/// CoW container, that allows you to wrap structs recoursively
+/// CoW container, that allows you to wrap structs recursively
 ///
 /// Usage:
 /// ```
