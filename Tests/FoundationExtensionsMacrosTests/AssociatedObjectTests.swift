@@ -159,7 +159,7 @@ final class AssociatedObjectTests: XCTestCase {
           }
           set {
             do {
-              func _macro_setAssociatedObject(_ policy: _AssociationPolicyKind) {
+              func _macro_setAssociatedObject(_ policy: objc_AssociationPolicy) {
                 _setAssociatedObject(
                   newValue,
                   to: self,
@@ -167,7 +167,7 @@ final class AssociatedObjectTests: XCTestCase {
                   policy: policy
                 )
               }
-              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyKindThreadSafety) {
+              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyThreadSafety) {
                 _setAssociatedObject(
                   newValue,
                   to: self,
@@ -255,7 +255,7 @@ final class AssociatedObjectTests: XCTestCase {
           }
           set {
             do {
-              func _macro_setAssociatedObject(_ policy: _AssociationPolicyKind) {
+              func _macro_setAssociatedObject(_ policy: objc_AssociationPolicy) {
                 _setAssociatedObject(
                   newValue,
                   to: self,
@@ -263,7 +263,7 @@ final class AssociatedObjectTests: XCTestCase {
                   policy: policy
                 )
               }
-              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyKindThreadSafety) {
+              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyThreadSafety) {
                 _setAssociatedObject(
                   newValue,
                   to: self,
@@ -300,7 +300,7 @@ final class AssociatedObjectTests: XCTestCase {
           }
           set {
             do {
-              func _macro_setAssociatedObject(_ policy: _AssociationPolicyKind) {
+              func _macro_setAssociatedObject(_ policy: objc_AssociationPolicy) {
                 _setAssociatedObject(
                   newValue,
                   to: self,
@@ -308,7 +308,7 @@ final class AssociatedObjectTests: XCTestCase {
                   policy: policy
                 )
               }
-              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyKindThreadSafety) {
+              func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyThreadSafety) {
                 _setAssociatedObject(
                   newValue,
                   to: self,

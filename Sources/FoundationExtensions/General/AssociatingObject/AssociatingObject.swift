@@ -4,11 +4,19 @@ public protocol AssociatingObject: AnyObject {
   @inlinable
   @discardableResult
   func setAssociatedObject<Object>(
-    _ object: Object,
+    _ object: Object?,
     forKey key: StaticString,
     policy: objc_AssociationPolicy
   ) -> Bool
-  
+
+  @inlinable
+  @discardableResult
+  func setAssociatedObject<Object>(
+    _ object: Object?,
+    forKey key: StaticString,
+    threadSafety: _AssociationPolicyThreadSafety
+  ) -> Bool
+
   @inlinable
   func getAssociatedObject<Object>(
     of type: Object.Type,
@@ -20,7 +28,7 @@ extension AssociatingObject {
   @inlinable
   @discardableResult
   public func setAssociatedObject<Object>(
-    _ object: Object,
+    _ object: Object?,
     forKey key: StaticString,
     policy: objc_AssociationPolicy = .retain(.nonatomic)
   ) -> Bool {
@@ -31,7 +39,22 @@ extension AssociatingObject {
       policy: policy
     )
   }
-  
+
+  @inlinable
+  @discardableResult
+  public func setAssociatedObject<Object>(
+    _ object: Object?,
+    forKey key: StaticString,
+    threadSafety: _AssociationPolicyThreadSafety
+  ) -> Bool {
+    return _setAssociatedObject(
+      object,
+      to: self,
+      forKey: key,
+      threadSafety: threadSafety
+    )
+  }
+
   @inlinable
   public func getAssociatedObject<Object>(
     of type: Object.Type = Object.self,
@@ -47,7 +70,7 @@ extension AssociatingObject {
 @inlinable
 @discardableResult
 public func _setAssociatedObject<Object>(
-  _ object: Object,
+  _ object: Object?,
   to associatingObject: AnyObject,
   forKey key: StaticString,
   threadSafety: _AssociationPolicyThreadSafety = .nonatomic
@@ -66,7 +89,7 @@ public func _setAssociatedObject<Object>(
 @inlinable
 @discardableResult
 public func _setAssociatedObject<Object>(
-  _ object: Object,
+  _ object: Object?,
   to associatingObject: AnyObject,
   forKey key: StaticString,
   policy: objc_AssociationPolicy

@@ -58,6 +58,32 @@ final class AssociatingObjectTests: XCTestCase {
     XCTAssertEqual(0, getValueForKey_zero(from: nsObject))
     XCTAssert(getValueForKey_zero(of: Any.self, from: customObject).isNil)
   }
+
+  func testStaticStringAddress() {
+    let a: StaticString = #function
+    let b: StaticString = #function
+    let c: StaticString = "testStaticStringAddress()"
+    let d: StaticString = "testStaticStringAddress()"
+    let f: StaticString = "other"
+
+    func getBaseAddress(for key: StaticString) -> String? {
+      key.withUTF8Buffer { pointer in
+        pointer.baseAddress.map(UnsafeRawPointer.init).map(\.debugDescription)
+      }
+    }
+
+    XCTAssertEqual(a.description, b.description)
+    XCTAssertEqual(getBaseAddress(for: a), getBaseAddress(for: b))
+
+    XCTAssertEqual(c.description, d.description)
+    XCTAssertEqual(getBaseAddress(for: c), getBaseAddress(for: d))
+
+    XCTAssertEqual(a.description, c.description)
+    XCTAssertEqual(getBaseAddress(for: a), getBaseAddress(for: c))
+
+    XCTAssertNotEqual(a.description, f.description)
+    XCTAssertNotEqual(getBaseAddress(for: a), getBaseAddress(for: f))
+  }
 }
 
 fileprivate func setZeroForKey_zero(to object: AnyObject) {

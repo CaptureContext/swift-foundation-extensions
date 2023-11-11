@@ -84,7 +84,7 @@ public struct AssociatedObjectMacro: AccessorMacro {
       setAssociatedObjectFunc = CodeBlockSyntax {
         """
         do {
-          func _macro_setAssociatedObject(_ policy: _AssociationPolicyKind) {
+          func _macro_setAssociatedObject(_ policy: objc_AssociationPolicy) {
             _setAssociatedObject(
               newValue,
               to: self,
@@ -92,7 +92,7 @@ public struct AssociatedObjectMacro: AccessorMacro {
               policy: policy
             )
           }
-          func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyKindThreadSafety) {
+          func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyThreadSafety) {
             _setAssociatedObject(
               newValue,
               to: self,
