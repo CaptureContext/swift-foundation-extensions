@@ -5,34 +5,34 @@ import Foundation
 
 @propertyWrapper
 public struct PropertyProxy<Object: AnyObject, Value> {
-  public static subscript(
-    _enclosingInstance instance: Object,
-    wrapped wrappedKeyPath: ReferenceWritableKeyPath<Object, Value>,
-    storage storageKeyPath: ReferenceWritableKeyPath<Object, Self>
-  ) -> Value {
-    get {
-      let path = instance[keyPath: storageKeyPath].path
-      return path.extract(from: instance)
-    }
-    set {
-      let wrapper = instance[keyPath: storageKeyPath]
-      _ = wrapper.path.embed(newValue, in: instance)
-    }
-  }
+	public static subscript(
+		_enclosingInstance instance: Object,
+		wrapped wrappedKeyPath: ReferenceWritableKeyPath<Object, Value>,
+		storage storageKeyPath: ReferenceWritableKeyPath<Object, Self>
+	) -> Value {
+		get {
+			let path = instance[keyPath: storageKeyPath].path
+			return path.extract(from: instance)
+		}
+		set {
+			let wrapper = instance[keyPath: storageKeyPath]
+			_ = wrapper.path.embed(newValue, in: instance)
+		}
+	}
 
-  private let path: FunctionalKeyPath<Object, Value>
-  
-  @available(*, unavailable, message: "@ObjectProxy can only be applied to classes")
-  public var wrappedValue: Value {
-    get { fatalError() }
-    set { fatalError() }
-  }
+	private let path: FunctionalKeyPath<Object, Value>
 
-  public init(_ path: FunctionalKeyPath<Object, Value>) {
-    self.path = path
-  }
+	@available(*, unavailable, message: "@ObjectProxy can only be applied to classes")
+	public var wrappedValue: Value {
+		get { fatalError() }
+		set { fatalError() }
+	}
 
-  public init(_ keyPath: ReferenceWritableKeyPath<Object, Value>) {
-    self.path = .init(keyPath)
-  }
+	public init(_ path: FunctionalKeyPath<Object, Value>) {
+		self.path = path
+	}
+
+	public init(_ keyPath: ReferenceWritableKeyPath<Object, Value>) {
+		self.path = .init(keyPath)
+	}
 }
