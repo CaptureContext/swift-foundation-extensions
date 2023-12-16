@@ -3,8 +3,8 @@ import SwiftSyntaxMacros
 
 @main
 struct FoundationExtensionsPlugin: CompilerPlugin {
-  let providingMacros: [Macro.Type] = [
-    AssociatedObjectMacro.self
-  ]
+	let providingMacros: [Macro.Type] = [
+		AssociatedObjectMacro.self
+	]
 }
 

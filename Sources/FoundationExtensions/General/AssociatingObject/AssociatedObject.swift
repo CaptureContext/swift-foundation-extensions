@@ -1,15 +1,17 @@
 @attached(accessor)
 public macro AssociatedObject(
-  _ policy: objc_AssociationPolicy
+	policy: objc_AssociationPolicy,
+	readonly: Bool
 ) = #externalMacro(
-  module: "FoundationExtensionsMacros",
-  type: "AssociatedObjectMacro"
+	module: "FoundationExtensionsMacros",
+	type: "AssociatedObjectMacro"
 )
 
 @attached(accessor)
 public macro AssociatedObject(
-  _ threadSafety: _AssociationPolicyThreadSafety = .nonatomic
+	threadSafety: _AssociationPolicyThreadSafety = .nonatomic,
+	readonly: Bool = true
 ) = #externalMacro(
-  module: "FoundationExtensionsMacros",
-  type: "AssociatedObjectMacro"
+	module: "FoundationExtensionsMacros",
+	type: "AssociatedObjectMacro"
 )

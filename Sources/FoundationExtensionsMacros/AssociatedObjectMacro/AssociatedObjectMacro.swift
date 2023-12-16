@@ -2,6 +2,7 @@ import MacroToolkit
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
+import Foundation
 
 public struct AssociatedObjectMacro: AccessorMacro {
   public static func expansion(
@@ -25,19 +26,22 @@ public struct AssociatedObjectMacro: AccessorMacro {
       return context.diagnose(.requiresExplicitType(binding._syntax), return: [])
     }
 
-    if binding.initialValue == nil {
-      guard case .optional = type else {
-        return context.diagnose(.requiresInitialValueForNonOptionals(binding._syntax), return: [])
-      }
-    }
+    do { // Unsupported accessors
+      let getter = binding.accessors.first(
+				where: \.accessorSpecifier.tokenKind == .keyword(.get)
+			)
 
-    do {
-      let getter = binding.accessors.first(where: \.accessorSpecifier.tokenKind == .keyword(.get))
       if let getter {
-        return context.diagnose(.unexpectedGetAccessor(getter.accessorSpecifier), return: [])
+        return context.diagnose(
+					.unexpectedGetAccessor(getter.accessorSpecifier),
+					return: []
+				)
       }
 
-      let setter = binding.accessors.first(where: \.accessorSpecifier.tokenKind == .keyword(.set))
+      let setter = binding.accessors.first(
+				where: \.accessorSpecifier.tokenKind == .keyword(.set)
+			)
+
       if let setter {
         return context.diagnose(.unexpectedSetAccessor(setter.accessorSpecifier), return: [])
       }
@@ -51,7 +55,7 @@ public struct AssociatedObjectMacro: AccessorMacro {
       where: \.accessorSpecifier.tokenKind == .keyword(.didSet)
     )
 
-    let setAssociatedObjectFunc: CodeBlockSyntax
+    var setAssociatedObjectFunc: CodeBlockSyntax? = nil
 
     switch node.arguments {
     case .none:
@@ -80,100 +84,169 @@ public struct AssociatedObjectMacro: AccessorMacro {
         """
       }
 
-    case let .argumentList(args) where args.count == 1:
-      setAssociatedObjectFunc = CodeBlockSyntax {
-        """
-        do {
-          func _macro_setAssociatedObject(_ policy: objc_AssociationPolicy) {
-            _setAssociatedObject(
-              newValue,
-              to: self,
-              forKey: #function,
-              policy: policy
-            )
-          }
-          func _macro_setAssociatedObject(_ threadSafety: _AssociationPolicyThreadSafety) {
-            _setAssociatedObject(
-              newValue,
-              to: self,
-              forKey: #function,
-              threadSafety: threadSafety
-            )
-          }
-          _macro_setAssociatedObject(\(raw: destructureSingle(args)!.description))
-        }
-        """
-      }
+		case let .argumentList(args) where (1...2).contains(args.count):
+			if 
+				let isReadonly = args.first(where: \.label?.text == "readonly"),
+				Expr(isReadonly.expression).asBooleanLiteral?.value == true
+			{
+				if binding.initialValue == nil {
+					return context.diagnose(
+						.requiresInitialValueForReadonly(binding._syntax),
+						return: []
+					)
+				}
+
+				if let didSetHandler {
+					return context.diagnose(
+						.unexpectedDidSetAccessor(didSetHandler.accessorSpecifier),
+						return: []
+					)
+				}
+
+				if let willSetHandler {
+					return context.diagnose(
+						.unexpectedWillSetAccessor(willSetHandler.accessorSpecifier),
+						return: []
+					)
+				}
+			} else if let threadSafety = args.first(where: \.label?.text == "threadSafety") {
+				setAssociatedObjectFunc = CodeBlockSyntax {
+					"""
+					do {
+						_setAssociatedObject(
+							newValue,
+							to: self,
+							forKey: #function,
+							threadSafety: \(raw: threadSafety.expression.description)
+						)
+					}
+					"""
+				}
+			} else if let policy = args.first(where: \.label?.text == "policy") {
+				setAssociatedObjectFunc = CodeBlockSyntax {
+					"""
+					do {
+						_setAssociatedObject(
+							newValue,
+							to: self,
+							forKey: #function,
+							policy: \(raw: policy.expression.description)
+						)
+					}
+					"""
+				}
+			} else {
+				return context.diagnose(.unexpectedArguments(decl._syntax), return: [])
+			}
 
     default:
       return context.diagnose(.unexpectedArguments(decl._syntax), return: [])
     }
 
-    let getter: CodeBlockSyntax = if let initialValue = binding.initialValue {
-      CodeBlockSyntax {
-        """
-        return _getAssociatedObject(
-          forKey: #function,
-          from: self
-        ).or(\(raw: initialValue._syntax.trimmed.description))
-        """
-      }
-    } else {
-      CodeBlockSyntax {
-        """
-        return _getAssociatedObject(
-          forKey: #function,
-          from: self
-        )
-        """
-      }
-    }
+		if binding.initialValue == nil {
+			guard case .optional = type else {
+				return context.diagnose(
+					.requiresInitialValueForNonOptionals(binding._syntax),
+					return: []
+				)
+			}
+		}
+		
+		let getter: CodeBlockSyntax = if let initialValue = binding.initialValue {
+			CodeBlockSyntax {
+				"""
+				return _getAssociatedObject(
+					forKey: #function,
+					from: self
+				) ?? {
+					let initialValue: \(raw: type.description) = \(raw: initialValue._syntax.trimmed.description)
+					_setAssociatedObject(
+						initialValue,
+						to: self,
+						forKey: #function
+					)
+					return \(raw: name)
+				}()
+				"""
+			}
+		} else {
+			CodeBlockSyntax {
+				"""
+				return _getAssociatedObject(
+					forKey: #function,
+					from: self
+				)
+				"""
+			}
+		}
 
-    let oldValueID = context.makeUniqueName(name)
-    let setter = CodeBlockSyntax {
-      if didSetHandler != nil {
-        """
-        let \(oldValueID) = \(raw: name)
-        """
-      }
+		if let setAssociatedObjectFunc {
+			let oldValueID = context.makeUniqueName(name)
+			let isOldValueNeeded: Bool = {
+				guard
+					let didSetHandler,
+					let body = didSetHandler.body
+				else { return false }
 
-      if let willSetHandler {
-        DoStmtSyntax {
-          if let param = willSetHandler.parameters?.name {
-            """
-            let \(param) = newValue
-            """
-          }
-          if let body = willSetHandler.body {
-            body.statements.trimmed
-          }
-        }
-      }
+				let parameter = didSetHandler.parameters?.name ?? "oldValue"
+				return body.description.range(of: parameter.description) != nil
+			}()
 
-      setAssociatedObjectFunc.statements
+			let setter = CodeBlockSyntax {
+				if isOldValueNeeded {
+					"""
+					let \(oldValueID) = \(raw: name)
+					"""
+				}
 
-      if let didSetHandler {
-        DoStmtSyntax {
-          """
-          let \(didSetHandler.parameters?.name ?? "oldValue") = \(oldValueID)
-          """
-          if let body = didSetHandler.body {
-            body.statements.trimmed
-          }
-        }
-      }
-    }
+				if let willSetHandler {
+					DoStmtSyntax {
+						if let param = willSetHandler.parameters?.name {
+							"""
+							let \(param) = newValue
+							"""
+						}
+						if let body = willSetHandler.body {
+							body.statements.trimmed
+						}
+					}
+				}
 
-    return [
-      AccessorDeclSyntax(
-        accessorSpecifier: .keyword(.get),
-        body: getter
-      ),
-      AccessorDeclSyntax(
-        accessorSpecifier: .keyword(.set),
-        body: setter
-      ),
-    ]
+				setAssociatedObjectFunc.statements
+
+				if let didSetHandler {
+					// Compiler produces a warning when parameter is unused
+					DoStmtSyntax {
+						if isOldValueNeeded {
+							"""
+							let \(didSetHandler.parameters?.name ?? "oldValue") = \(oldValueID)
+							"""
+						}
+						if let body = didSetHandler.body {
+							body.statements.trimmed
+						}
+					}
+				}
+			}
+
+			return [
+				AccessorDeclSyntax(
+					accessorSpecifier: .keyword(.get),
+					body: getter
+				),
+				AccessorDeclSyntax(
+					accessorSpecifier: .keyword(.set),
+					body: setter
+				),
+			]
+		} else {
+			return [
+				AccessorDeclSyntax(
+					accessorSpecifier: .keyword(.get),
+					body: getter
+				),
+			]
+		}
   }
 }
 
@@ -199,12 +272,33 @@ fileprivate extension Diagnostic {
       .build()
   }
 
+	static func requiresInitialValueForReadonly(_ node: some SyntaxProtocol) -> Self {
+	 DiagnosticBuilder(for: node)
+		 .messageID(domain: "AssociatedObject", id: "requres_initial_value_for_non-optionals")
+		 .message("`@AssociatedObject` requires initial value for readonly properties.")
+		 .build()
+ }
+
   static func unexpectedGetAccessor(_ node: some SyntaxProtocol) -> Self {
     DiagnosticBuilder(for: node)
       .messageID(domain: "AssociatedObject", id: "unexpected_get_accessor")
       .message("`@AssociatedObject` does not support custom `get` accessors")
       .build()
   }
+
+	static func unexpectedDidSetAccessor(_ node: some SyntaxProtocol) -> Self {
+	 DiagnosticBuilder(for: node)
+		 .messageID(domain: "AssociatedObject", id: "unexpected_get_accessor")
+		 .message("Readonly `@AssociatedObject` does not support `didSet` accessors")
+		 .build()
+ }
+
+	static func unexpectedWillSetAccessor(_ node: some SyntaxProtocol) -> Self {
+	 DiagnosticBuilder(for: node)
+		 .messageID(domain: "AssociatedObject", id: "unexpected_get_accessor")
+		 .message("Readonly `@AssociatedObject` does not support `willSet` accessors")
+		 .build()
+ }
 
   static func unexpectedSetAccessor(_ node: some SyntaxProtocol) -> Self {
     DiagnosticBuilder(for: node)
@@ -259,7 +353,13 @@ fileprivate extension Diagnostic {
             else { return attribute }
 
             attribute.arguments = .argumentList(.init {
-              .init(expression: ExprSyntax(stringLiteral: "<#AssociationPolicy#>"))
+              LabeledExprSyntax(
+								expression: ExprSyntax(stringLiteral: "<#AssociationPolicy#>")
+							)
+							LabeledExprSyntax(
+								label: "readonly",
+								expression: ExprSyntax(stringLiteral: "<#Bool#>")
+							)
             })
 
             return .attribute(attribute)
