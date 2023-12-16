@@ -94,7 +94,7 @@ final class AssociatedObjectTests: XCTestCase {
 								to: self,
 								forKey: #function
 							)
-							return value
+							return self.value
 						}()
 					}
 					set {
@@ -471,7 +471,7 @@ final class AssociatedObjectTests: XCTestCase {
 								to: self,
 								forKey: #function
 							)
-							return value
+							return self.value
 						}()
 					}
 
@@ -526,7 +526,7 @@ final class AssociatedObjectTests: XCTestCase {
 								to: self,
 								forKey: #function
 							)
-							return value
+							return self.value
 						}()
 					}
 
@@ -580,7 +580,7 @@ final class AssociatedObjectTests: XCTestCase {
 								to: self,
 								forKey: #function
 							)
-							return value
+							return self.value
 						}()
 					}
 
@@ -625,7 +625,7 @@ final class AssociatedObjectTests: XCTestCase {
 								to: self,
 								forKey: #function
 							)
-							return value
+							return self.value
 						}()
 					}
 				}

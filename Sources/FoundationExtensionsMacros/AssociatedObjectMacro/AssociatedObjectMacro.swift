@@ -165,7 +165,7 @@ public struct AssociatedObjectMacro: AccessorMacro {
 						to: self,
 						forKey: #function
 					)
-					return \(raw: name)
+					return self.\(raw: name)
 				}()
 				"""
 			}
