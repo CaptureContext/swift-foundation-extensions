@@ -2,9 +2,19 @@
 
 [![SwiftPM 5.9](https://img.shields.io/badge/swiftpm-5.9-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
 
-Standard extensions for Foundation
+Standard extensions for Foundation framework
 
-> NOTE: The package is in beta (feel free suggest your improvements [here](https://github.com/capturecontext/swift-foundation-extensions/discussions/1))
+- [Contents](#Contents)
+  - [Coding](#Coding)
+  - [NSLocking](#NSLocking)
+  - [Optional](#Optional)
+  - [Undo/Redo management](#Undo/Redo management)
+  - [Object Association](#Object Association)
+  - [Swizzling](Swizzling)
+- [Installation](#Installation)
+  - [Basic](#Basic)
+  - [Recommended](#Recommended)
+- [Licence](#Licence)
 
 ## Contents
 
@@ -95,23 +105,75 @@ extension SomeClass {
   @AssociatedObject
   var storedVariableInExtension: Int = 0
   
+  @AssociatedObject(readonly: true)
+  var storedVariableInExtension: SomeObject = .init()
+  
   @AssociatedObject
   var optionalValue: Int?
   
   @AssociatedObject
   var object: Int?
     
-  @AssociatedObject(.atomic)
+  @AssociatedObject(threadSafety: .atomic)
   var threadSafeValue: Int?
     
-  @AssociatedObject(.atomic)
+  @AssociatedObject(threadSafety: .atomic)
   var threadSafeObject: Object?
     
-  @AssociatedObject(.assign)
+  @AssociatedObject(policy: .assign)
   var customPolicyValue: Int?
     
-  @AssociatedObject(.retain(.atomic))
+  @AssociatedObject(policy: .retain(.atomic))
   var customPolicyThreadSafeObject: Object?
+}
+```
+
+### Swizzling
+
+This package also provides some sugar for objc method swizzling
+
+```swift
+extension UIViewController {
+  // Runs once in app lifetime
+  // Repeated calls do nothing
+  private static let swizzle: Void = {
+    // This example is not really representative since these methods
+    // can be simply globally overriden, but it's just an example
+    // for the readme and you can find live example at
+    // https://github.com/capturecontext/combine-cocoa-navigation
+    
+    objc_exchangeImplementations(
+    	#selector(viewWillAppear)
+      #selector(__swizzledViewWillAppear)
+    )
+    
+    objc_exchangeImplementations(
+    	#selector(viewDidAppear)
+      #selector(__swizzledViewDidAppear)
+    )
+  }()
+
+  // Swizzle automatically when the first
+  // navigationController loads it's view
+  // for some classes you may have to make `swizzle`
+  // handle public and trigger it in the beginning
+  // of your app's lifetime (ex: in AppDelegate)
+  open override func loadView() {
+    UIViewController.swizzle
+    super.viewDidLoad()
+  }
+
+  @objc dynamic
+  private func __swizzledViewWillAppear(_ animated: Bool) {
+    __swizzledViewWillAppear(animated) // calls original method
+    print(type(of: self), ObjectIdentifier(self), "will appear")
+  }
+
+  @objc dynamic
+  private func __swizzledViewDidAppear(_ animated: Bool) {
+    __swizzledViewDidAppear(animated) // calls original method
+    print(type(of: self), ObjectIdentifier(self), "did appear")
+  }
 }
 ```
 
@@ -133,7 +195,7 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 .package(
   name: "swift-foundation-extensions",
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.3.2")
+  .upToNextMinor(from: "0.4.0")
 )
 ```
 
