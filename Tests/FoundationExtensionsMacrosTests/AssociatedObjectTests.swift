@@ -160,11 +160,12 @@ final class AssociatedObjectTests: XCTestCase {
 			extension Object {
 				@AssociatedObject("Hello, World")
 			 ╰─ 🛑 [internal] `@AssociatedObject` received unexpected args, submit an issue here: https://github.com/capturecontext/swift-foundation-extensions
-			    ✏️ Remove arguments  │     ✏️ Replace arguments
+			    ✏️ Remove arguments
+			    ✏️ Replace arguments
 				var value: Int?
 			}
 			"""
-		} fixes: {
+		}fixes: {
 			"""
 			extension Object {
 				@AssociatedObject
@@ -211,11 +212,12 @@ final class AssociatedObjectTests: XCTestCase {
 			extension Object {
 				@AssociatedObject(.copy, .nonatomic, .readonly)
 			 ╰─ 🛑 [internal] `@AssociatedObject` received unexpected args, submit an issue here: https://github.com/capturecontext/swift-foundation-extensions
-			    ✏️ Remove arguments  │     ✏️ Replace arguments
+			    ✏️ Remove arguments
+			    ✏️ Replace arguments
 				var value: Int?
 			}
 			"""
-		} fixes: {
+		}fixes: {
 			"""
 			extension Object {
 				@AssociatedObject
