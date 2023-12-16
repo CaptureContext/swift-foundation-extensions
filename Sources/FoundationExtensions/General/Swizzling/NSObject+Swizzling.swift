@@ -20,6 +20,24 @@ extension NSObjectSwizzlingProtocol {
   ///   }
 	/// }
 	/// ```
+	///
+	/// > For swift classes consider using Swift swizzling with
+	/// > `@_dynamicReplacement`, but keep in mind that Swift
+	/// > swizzling causes infinite recursion for objc methods and `async` functions
+	/// >
+	/// > Forum:
+	/// > - [@_dynamicReplacement causes infinite recursion](
+	///  https://forums.swift.org/t/dynamicreplacement-causes-infinite-recursion/52768
+	/// )
+	/// >
+	/// > Swift issues:
+	/// > - [@_dynamicReplacement could not call origin async method](
+	///  https://github.com/apple/swift/issues/62214
+	/// )
+	/// > - [@_dynamicReplacement can't call the original method](
+	///  https://github.com/apple/swift/issues/53916
+	/// )
+	///
 	public static func objc_exchangeImplementations(
 		_ originalSelector: Selector,
 		_ swizzledSelector: Selector
