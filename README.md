@@ -4,17 +4,19 @@
 
 Standard extensions for Foundation framework
 
-- [Contents](#Contents)
-  - [Coding](#Coding)
-  - [NSLocking](#NSLocking)
-  - [Optional](#Optional)
-  - [Undo/Redo management](#Undo/Redo%20Management)
-  - [Object Association](#Object%20Association)
-  - [Swizzling](#Swizzling)
-- [Installation](#Installation)
-  - [Basic](#Basic)
-  - [Recommended](#Recommended)
-- [Licence](#Licence)
+- [Contents](#contents)
+  - [Coding](#coding)
+  - [NSLocking](#nslocking)
+  - [Optional](#optional)
+  - [Undo/Redo management](#undoredo-management)
+  - [Indirect](#indirect)
+  - [Property Proxy](#property-proxy)
+  - [Object Association](#object-Association)
+  - [Swizzling](#swizzling)
+- [Installation](#installation)
+  - [Basic](#basic)
+  - [Recommended](#recommended)
+- [Licence](#licence)
 
 ## Contents
 
