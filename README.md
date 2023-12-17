@@ -4,6 +4,7 @@
 
 Standard extensions for Foundation framework
 
+- [Documentation](https://swiftpackageindex.com/CaptureContext/swift-foundation-extensions/0.4.2/documentation/foundationextensions)
 - [Contents](#contents)
   - [Coding](#coding)
   - [NSLocking](#nslocking)
