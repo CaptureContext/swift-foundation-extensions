@@ -197,7 +197,7 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 .package(
   name: "swift-foundation-extensions",
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.4.0")
+  .upToNextMinor(from: "0.4.2")
 )
 ```
 
