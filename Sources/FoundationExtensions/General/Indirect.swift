@@ -3,7 +3,7 @@ import Foundation
 /// CoW container, that allows you to wrap structs recursively
 ///
 /// Usage:
-/// ```
+/// ```swift
 /// public struct User {
 ///     internal init(id: UUID, favoriteFollower: User?) {
 ///         self.id = id

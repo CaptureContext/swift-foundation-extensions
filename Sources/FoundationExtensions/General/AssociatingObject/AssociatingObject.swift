@@ -94,14 +94,17 @@ public func _setAssociatedObject<Object>(
 	forKey key: StaticString,
 	policy: objc_AssociationPolicy
 ) -> Bool {
-	return key.withUTF8Buffer { pointer in
-		if let p = pointer.baseAddress.map(UnsafeRawPointer.init) {
-			objc_setAssociatedObject(associatingObject, p, object, policy)
-			return true
-		} else {
-			return false
-		}
-	}
+	guard key.hasPointerRepresentation
+	else { return false }
+
+	objc_setAssociatedObject(
+		associatingObject,
+		UnsafeRawPointer(key.utf8Start),
+		object,
+		policy
+	)
+
+	return true
 }
 
 @inlinable
@@ -110,13 +113,14 @@ public func _getAssociatedObject<Object>(
 	forKey key: StaticString,
 	from associatingObject: AnyObject
 ) -> Object? {
-	key.withUTF8Buffer { pointer in
-		if let p = pointer.baseAddress.map(UnsafeRawPointer.init) {
-			return objc_getAssociatedObject(associatingObject, p).flatMap { $0 as? Object }
-		} else {
-			return nil
-		}
-	}
+	guard key.hasPointerRepresentation
+	else { return nil }
+
+	return objc_getAssociatedObject(
+		associatingObject,
+		UnsafeRawPointer(key.utf8Start)
+	)
+	.flatMap { $0 as? Object }
 }
 
 extension NSObject: AssociatingObject {}

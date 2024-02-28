@@ -4,7 +4,9 @@
 
 Standard extensions for Foundation framework
 
-- [Documentation](https://swiftpackageindex.com/CaptureContext/swift-foundation-extensions/0.4.2/documentation/foundationextensions)
+Macros: [`swift-foundation-extensions-macros`](https://github.com/capturecontext/swift-foundation-extensions-macros)
+
+- [Documentation](https://swiftpackageindex.com/CaptureContext/swift-foundation-extensions/0.5.0/documentation/foundationextensions)
 - [Contents](#contents)
   - [Coding](#coding)
   - [NSLocking](#nslocking)
@@ -101,9 +103,26 @@ view.text = "Hello, World!"
 
 ### Object Association
 
+Basic helpers for object association are available in a base package
+
+```swift
+extension UIViewController {
+  var someStoredProperty: Int {
+    get { getAssociatedObject(forKey: #function).or(0) }
+    set { setAssociatedObject(newValue, forKey: #function)  }
+  }
+}
+
+let value: Bool = getAssociatedObject(forKey: "value", from: object)
+```
+
+But the full power of associated objects is provided by `FoundationExtensionsMacros` target
+
 > By default `@AssociatedObject` macro uses `.retain(.nonatomic)` for classes and `.copy(.nonatomic)` `objc_AssociationPolicy` for structs.
 
 ```swift
+import FoundationExtensionsMacros
+
 extension SomeClass {
   @AssociatedObject
   var storedVariableInExtension: Int = 0
@@ -130,6 +149,8 @@ extension SomeClass {
   var customPolicyThreadSafeObject: Object?
 }
 ```
+
+> Macros require swift-syntax compilation, so it will affect cold compilation time
 
 ### Swizzling
 
@@ -196,9 +217,8 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 
 ```swift
 .package(
-  name: "swift-foundation-extensions",
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.4.2")
+  .upToNextMinor(from: "0.5.0")
 )
 ```
 
@@ -211,6 +231,15 @@ Do not forget about target dependencies:
 )
 ```
 
+```swift
+.product(
+  name: "FoundationExtensionsMacros", 
+  package: "swift-foundation-extensions"
+)
+```
+
+
+
 ## License
 
-This library is released under the MIT license. See [LICENSE](LICENSE) for details.
+This library is released under the MIT license. See [LICENCE](LICENCE) for details.

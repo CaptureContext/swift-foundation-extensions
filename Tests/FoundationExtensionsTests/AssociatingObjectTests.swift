@@ -65,11 +65,10 @@ final class AssociatingObjectTests: XCTestCase {
 		let c: StaticString = "testStaticStringAddress()"
 		let d: StaticString = "testStaticStringAddress()"
 		let f: StaticString = "other"
-		
+		let g: StaticString = "testStaticStringAddress_same_prefix"
+
 		func getBaseAddress(for key: StaticString) -> String? {
-			key.withUTF8Buffer { pointer in
-				pointer.baseAddress.map(UnsafeRawPointer.init).map(\.debugDescription)
-			}
+			key.utf8Start.debugDescription
 		}
 		
 		XCTAssertEqual(a.description, b.description)
@@ -83,6 +82,9 @@ final class AssociatingObjectTests: XCTestCase {
 		
 		XCTAssertNotEqual(a.description, f.description)
 		XCTAssertNotEqual(getBaseAddress(for: a), getBaseAddress(for: f))
+
+		XCTAssertNotEqual(a.description, g.description)
+		XCTAssertNotEqual(getBaseAddress(for: a), getBaseAddress(for: g))
 	}
 }
 
