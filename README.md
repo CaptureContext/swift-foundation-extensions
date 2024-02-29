@@ -1,10 +1,8 @@
 # swift-foundation-extensions
 
-[![SwiftPM 5.9](https://img.shields.io/badge/swiftpm-5.9-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
+[![CI](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml) [![SwiftPM 5.9](https://img.shields.io/badge/swiftpm-5.9-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
 
 Standard extensions for Foundation framework
-
-Macros: [`swift-foundation-extensions-macros`](https://github.com/capturecontext/swift-foundation-extensions-macros)
 
 - [Documentation](https://swiftpackageindex.com/CaptureContext/swift-foundation-extensions/0.5.0/documentation/foundationextensions)
 - [Contents](#contents)
@@ -85,6 +83,17 @@ state.redo()      // value == 2
 ### Indirect
 
 CoW container, which allows you to recursively include single instances of value types
+
+```swift
+struct ListNode<Value> {
+  var value: Value
+  
+	@Indirect
+  var next: ListNode<Value>?
+}
+```
+
+
 
 ### PropertyProxy
 
@@ -176,16 +185,6 @@ extension UIViewController {
       #selector(__swizzledViewDidAppear)
     )
   }()
-
-  // Swizzle automatically when the first
-  // navigationController loads it's view
-  // for some classes you may have to make `swizzle`
-  // handle public and trigger it in the beginning
-  // of your app's lifetime (ex: in AppDelegate)
-  open override func loadView() {
-    UIViewController.swizzle
-    super.viewDidLoad()
-  }
 
   @objc dynamic
   private func __swizzledViewWillAppear(_ animated: Bool) {
