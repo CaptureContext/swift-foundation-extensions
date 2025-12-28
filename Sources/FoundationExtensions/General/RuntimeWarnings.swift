@@ -1,11 +1,13 @@
 import Foundation
 
 extension Notification.Name {
+	@available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
 	public static let foundationExtensionsRuntimeWarning: Self = .init(
 		rawValue: "FoundationExtensions.runtimeWarning"
 	)
 }
 
+@available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
 @_transparent
 @inlinable
 @inline(__always)
@@ -14,7 +16,7 @@ public func runtimeWarn(
 	category: String? = "FoundationExtensions",
 	notificationName: Notification.Name? = .foundationExtensionsRuntimeWarning
 ) {
-	#if DEBUG
+	#if DEBUG && canImport(XCTestDynamicOverlay)
 	let message = message()
 	notificationName.map { notificationName in
 		NotificationCenter.default.post(
@@ -25,8 +27,8 @@ public func runtimeWarn(
 	}
 
 	let category = category ?? "Runtime Warning"
-	
-	if _XCTIsTesting {
+
+	if isTesting {
 		XCTFail(message)
 	} else {
 		#if canImport(os)
@@ -44,40 +46,40 @@ public func runtimeWarn(
 	#endif
 }
 
-#if DEBUG
+#if DEBUG && canImport(XCTestDynamicOverlay)
 import XCTestDynamicOverlay
 
 #if canImport(os)
-	import os
+import os
 
-	// NB: Xcode runtime warnings offer a much better experience than traditional assertions and
-	//     breakpoints, but Apple provides no means of creating custom runtime warnings ourselves.
-	//     To work around this, we hook into SwiftUI's runtime issue delivery mechanism, instead.
-	//
-	// Feedback filed: https://gist.github.com/stephencelis/a8d06383ed6ccde3e5ef5d1b3ad52bbc
-	@usableFromInline
-	let dso = { () -> UnsafeMutableRawPointer in
-		let count = _dyld_image_count()
-		for i in 0..<count {
-			if let name = _dyld_get_image_name(i) {
-				let swiftString = String(cString: name)
-				if swiftString.hasSuffix("/SwiftUI") {
-					if let header = _dyld_get_image_header(i) {
-						return UnsafeMutableRawPointer(mutating: UnsafeRawPointer(header))
-					}
+// NB: Xcode runtime warnings offer a much better experience than traditional assertions and
+//     breakpoints, but Apple provides no means of creating custom runtime warnings ourselves.
+//     To work around this, we hook into SwiftUI's runtime issue delivery mechanism, instead.
+//
+// Feedback filed: https://gist.github.com/stephencelis/a8d06383ed6ccde3e5ef5d1b3ad52bbc
+@usableFromInline
+nonisolated(unsafe) let dso = { () -> UnsafeMutableRawPointer in
+	let count = _dyld_image_count()
+	for i in 0..<count {
+		if let name = _dyld_get_image_name(i) {
+			let swiftString = String(cString: name)
+			if swiftString.hasSuffix("/SwiftUI") {
+				if let header = _dyld_get_image_header(i) {
+					return UnsafeMutableRawPointer(mutating: UnsafeRawPointer(header))
 				}
 			}
 		}
-		return UnsafeMutableRawPointer(mutating: #dsohandle)
-	}()
+	}
+	return UnsafeMutableRawPointer(mutating: #dsohandle)
+}()
 #else
-	import Foundation
+import Foundation
 
-	@usableFromInline
-	let formatter: DateFormatter = {
-		let formatter = DateFormatter()
-		formatter.dateFormat = "yyyy-MM-dd HH:MM:SS.sssZ"
-		return formatter
-	}()
+@usableFromInline
+let formatter: DateFormatter = {
+	let formatter = DateFormatter()
+	formatter.dateFormat = "yyyy-MM-dd HH:MM:SS.sssZ"
+	return formatter
+}()
 #endif
 #endif

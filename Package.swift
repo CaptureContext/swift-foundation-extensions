@@ -1,7 +1,6 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.2
 
 import PackageDescription
-import CompilerPluginSupport
 
 let package = Package(
 	name: "swift-foundation-extensions",
@@ -24,20 +23,16 @@ let package = Package(
 	],
 	dependencies: [
 		.package(
-			url: "https://github.com/capturecontext/swift-declarative-configuration.git",
-			.upToNextMinor(from: "0.3.0")
+			url: "https://github.com/capturecontext/swift-resettable.git",
+			.upToNextMinor(from: "0.1.0")
 		),
 		.package(
-			url: "https://github.com/pointfreeco/swift-custom-dump",
-			.upToNextMajor(from: "1.0.0")
+			url: "https://github.com/capturecontext/swift-equated.git",
+			.upToNextMinor(from: "0.0.1")
 		),
 		.package(
-			url: "https://github.com/stackotter/swift-macro-toolkit.git",
-			.upToNextMinor(from: "0.3.0")
-		),
-		.package(
-			url: "https://github.com/pointfreeco/swift-macro-testing.git",
-			.upToNextMinor(from: "0.2.2")
+			url: "https://github.com/capturecontext/swift-associated-objects.git",
+			.upToNextMinor(from: "0.1.0")
 		)
 	],
 	targets: [
@@ -45,12 +40,16 @@ let package = Package(
 			name: "FoundationExtensions",
 			dependencies: [
 				.product(
-					name: "FunctionalKeyPath",
-					package: "swift-declarative-configuration"
+					name: "AssociatedObjects",
+					package: "swift-associated-objects"
 				),
 				.product(
-					name: "CustomDump",
-					package: "swift-custom-dump"
+					name: "Resettable",
+					package: "swift-resettable"
+				),
+				.product(
+					name: "Equated",
+					package: "swift-equated"
 				),
 			]
 		),
@@ -58,35 +57,16 @@ let package = Package(
 			name: "FoundationExtensionsMacros",
 			dependencies: [
 				.target(name: "FoundationExtensions"),
-				.target(name: "FoundationExtensionsMacrosPlugin"),
-			]
-		),
-		.macro(
-			name: "FoundationExtensionsMacrosPlugin",
-			dependencies: [
 				.product(
-					name: "MacroToolkit",
-					package: "swift-macro-toolkit"
-				)
+					name: "AssociatedObjectsMacros",
+					package: "swift-associated-objects"
+				),
 			]
 		),
 		.testTarget(
 			name: "FoundationExtensionsTests",
 			dependencies: [
 				.target(name: "FoundationExtensions"),
-			]
-		),
-		.testTarget(
-			name: "FoundationExtensionsMacrosPluginTests",
-			dependencies: [
-				.target(name: "FoundationExtensionsMacrosPlugin"),
-				.product(name: "MacroTesting", package: "swift-macro-testing"),
-			]
-		),
-		.testTarget(
-			name: "FoundationExtensionsMacrosTests",
-			dependencies: [
-				.target(name: "FoundationExtensionsMacros"),
 			]
 		),
 	]

@@ -1,6 +1,5 @@
 // https://www.swiftbysundell.com/articles/accessing-a-swift-property-wrappers-enclosing-instance/
 
-import FunctionalKeyPath
 import Foundation
 
 @propertyWrapper
@@ -11,28 +10,50 @@ public struct PropertyProxy<Object: AnyObject, Value> {
 		storage storageKeyPath: ReferenceWritableKeyPath<Object, Self>
 	) -> Value {
 		get {
-			let path = instance[keyPath: storageKeyPath].path
-			return path.extract(from: instance)
+			let wrapped = instance[keyPath: storageKeyPath]
+			return instance[keyPath: wrapped.keyPath]
 		}
 		set {
 			let wrapper = instance[keyPath: storageKeyPath]
-			_ = wrapper.path.embed(newValue, in: instance)
+			instance[keyPath: wrapper.keyPath] = newValue
 		}
 	}
 
-	private let path: FunctionalKeyPath<Object, Value>
+	private let keyPath: ReferenceWritableKeyPath<Object, Value>
 
-	@available(*, unavailable, message: "@ObjectProxy can only be applied to classes")
+	@available(*, unavailable, message: "@PropertyProxy can only be applied to classes")
 	public var wrappedValue: Value {
 		get { fatalError() }
 		set { fatalError() }
 	}
 
-	public init(_ path: FunctionalKeyPath<Object, Value>) {
-		self.path = path
+	public init(_ keyPath: ReferenceWritableKeyPath<Object, Value>) {
+		self.keyPath = keyPath
+	}
+}
+
+@propertyWrapper
+public struct ReadonlyPropertyProxy<Object: AnyObject, Value> {
+	public static subscript(
+		_enclosingInstance instance: Object,
+		wrapped wrappedKeyPath: KeyPath<Object, Value>,
+		storage storageKeyPath: KeyPath<Object, Self>
+	) -> Value {
+		get {
+			let wrapped = instance[keyPath: storageKeyPath]
+			return instance[keyPath: wrapped.keyPath]
+		}
 	}
 
-	public init(_ keyPath: ReferenceWritableKeyPath<Object, Value>) {
-		self.path = .init(keyPath)
+	private let keyPath: KeyPath<Object, Value>
+
+	@available(*, unavailable, message: "@PropertyProxy can only be applied to classes")
+	public var wrappedValue: Value {
+		get { fatalError() }
+		set { fatalError() }
+	}
+
+	public init(_ keyPath: KeyPath<Object, Value>) {
+		self.keyPath = keyPath
 	}
 }

@@ -1,6 +1,6 @@
 # swift-foundation-extensions
 
-[![CI](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml) [![SwiftPM 5.9](https://img.shields.io/badge/swiftpm-5.9-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
+[![CI](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml) [![SwiftPM 6.2](https://img.shields.io/badge/Swift-6.2-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
 
 Standard extensions for Foundation framework
 
@@ -63,23 +63,6 @@ func encode(to encoder: encoder) throws {
 - `assign(to:on:)` - assigns wrapped value to a specified target property by the keyPath
 - `ifLetAssign(to:on:)` - assigns wrapped value to a specified target property by the keyPath if an optional was not nil
 
-### Undo/Redo management
-
-```swift
-struct State {
-  var value: Int = 0
-}
-
-@Resettable
-let state = State()
-state.value = 1   // value == 1
-state.value *= 10 // value == 10
-state.undo()      // value == 1
-state.value += 1  // value == 2
-state.undo()      // value == 1
-state.redo()      // value == 2
-```
-
 ### Indirect
 
 CoW container, which allows you to recursively include single instances of value types
@@ -93,8 +76,6 @@ struct ListNode<Value> {
 }
 ```
 
-
-
 ### PropertyProxy
 
 ```swift
@@ -103,63 +84,15 @@ class MyView: UIView {
   
   @PropertyProxy(\MyView.label.text)
   var text: String?
+  
+  @ReadonlyPropertyProxy(\MyView.label.text)
+  var readonlyText: String?
 }
 
 let view: MyView = .init()
 view.label.text // ❌
 view.text = "Hello, World!"
 ```
-
-### Object Association
-
-Basic helpers for object association are available in a base package
-
-```swift
-extension UIViewController {
-  var someStoredProperty: Int {
-    get { getAssociatedObject(forKey: #function).or(0) }
-    set { setAssociatedObject(newValue, forKey: #function)  }
-  }
-}
-
-let value: Bool = getAssociatedObject(forKey: "value", from: object)
-```
-
-But the full power of associated objects is provided by `FoundationExtensionsMacros` target
-
-> By default `@AssociatedObject` macro uses `.retain(.nonatomic)` for classes and `.copy(.nonatomic)` `objc_AssociationPolicy` for structs.
-
-```swift
-import FoundationExtensionsMacros
-
-extension SomeClass {
-  @AssociatedObject
-  var storedVariableInExtension: Int = 0
-  
-  @AssociatedObject(readonly: true)
-  var storedVariableInExtension: SomeObject = .init()
-  
-  @AssociatedObject
-  var optionalValue: Int?
-  
-  @AssociatedObject
-  var object: Int?
-    
-  @AssociatedObject(threadSafety: .atomic)
-  var threadSafeValue: Int?
-    
-  @AssociatedObject(threadSafety: .atomic)
-  var threadSafeObject: Object?
-    
-  @AssociatedObject(policy: .assign)
-  var customPolicyValue: Int?
-    
-  @AssociatedObject(policy: .retain(.atomic))
-  var customPolicyThreadSafeObject: Object?
-}
-```
-
-> Macros require swift-syntax compilation, so it will affect cold compilation time
 
 ### Swizzling
 
@@ -200,6 +133,36 @@ extension UIViewController {
 }
 ```
 
+### More
+
+More extensions can be found in sources.
+
+### Equated
+
+> ⚠️
+>
+> `FoundationExtensions` simply exports `Equated` for backwards compatibility
+>
+> It's likely to be removed in favor of a separate package [swift-equated](https://github.com/capturecontext/swift-equated), see it's readme for more info
+
+### Undo/Redo management
+
+> ⚠️
+>
+> `FoundationExtensions` simply exports `Resettable` for backwards compatibility
+>
+> It's likely to be removed in favor of a separate package [swift-resettable](https://github.com/capturecontext/swift-resettable), see it's readme for more info
+
+### Object Association
+
+> ⚠️
+>
+> `FoundationExtensions` simply exports `AssociatedObjects`
+>
+> `FoundationExtensionsMacros` simply exports `AssociatedObjectsMacros`
+>
+> Likely to be removed in favor of a separate package [swift-associated-objects](https://github.com/capturecontext/swift-associated-objects)
+
 ## Installation
 
 ### Basic
@@ -217,7 +180,7 @@ If you use SwiftPM for your project, you can add StandardExtensions to your pack
 ```swift
 .package(
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.5.0")
+  .upToNextMinor(from: "0.6.0")
 )
 ```
 
@@ -231,13 +194,12 @@ Do not forget about target dependencies:
 ```
 
 ```swift
+// Consider depending on swift-associated-objects package instead
 .product(
   name: "FoundationExtensionsMacros", 
   package: "swift-foundation-extensions"
 )
 ```
-
-
 
 ## License
 
