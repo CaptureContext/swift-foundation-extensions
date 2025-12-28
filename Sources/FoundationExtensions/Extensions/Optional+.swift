@@ -35,9 +35,11 @@ extension Optional {
 
 	/// Unwraps an optional and returns unwrapping result
 	@inlinable
-	public func unwrap(function: String = #function, file: String = #filePath, line: Int = #line)
-	-> Result<Wrapped, UnwrappingError<Wrapped>>
-	{
+	public func unwrap(
+		function: String = #function,
+		file: String = #file,
+		line: Int = #line
+	) -> Result<Wrapped, UnwrappingError> {
 		switch self {
 		case .some(let value):
 			return .success(value)
@@ -46,7 +48,8 @@ extension Optional {
 				UnwrappingError(
 					function: function,
 					file: file,
-					line: line)
+					line: line
+				)
 			)
 		}
 	}
@@ -98,5 +101,36 @@ extension Optional where Wrapped: Collection {
 	@inlinable
 	public var isNilOrEmpty: Bool {
 		map(\.isEmpty).or(true)
+	}
+}
+
+extension Optional {
+	public struct UnwrappingError: Error {
+		public let type: Wrapped.Type
+		public let function: String
+		public let file: String
+		public let line: Int
+
+		public init(
+			_ type: Wrapped.Type = Wrapped.self,
+			function: String = #function,
+			file: String = #file,
+			line: Int = #line
+		) {
+			self.type = type
+			self.function = function
+			self.file = file
+			self.line = line
+		}
+
+		@inlinable
+		public var debugDescription: String {
+			localizedDescription
+				.appending("\n{")
+				.appending("\n    function: \(function)")
+				.appending("\n    file: \(file),")
+				.appending("\n    line: \(line)")
+				.appending("\n}")
+		}
 	}
 }

@@ -45,5 +45,4 @@ extension NSLocking {
 	public func execute<T>(_ closure: () -> T) -> T {
 		withLock(closure)
 	}
-
 }

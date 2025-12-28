@@ -65,6 +65,10 @@ func encode(to encoder: encoder) throws {
 
 ### Undo/Redo management
 
+> ⚠️
+> - `FoundationExtensions` simply exports `Resettable`
+> Likely to be removed in `1.0.0` in favor of a separate package [swift-resettable](https://github.com/capturecontext/swift-resettable)
+
 ```swift
 struct State {
   var value: Int = 0
@@ -111,6 +115,11 @@ view.text = "Hello, World!"
 ```
 
 ### Object Association
+
+> ⚠️
+> - `FoundationExtensions` simply exports `AssociatedObjects`
+> - `FoundationExtensionsMacros` simply exports `AssociatedObjectsMacros`
+> Likely to be removed in `1.0.0` in favor of a separate package [swift-associated-objects](https://github.com/capturecontext/swift-associated-objects)
 
 Basic helpers for object association are available in a base package
 

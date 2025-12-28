@@ -1,1 +1,2 @@
+@_exported import AssociatedObjectsMacros
 @_exported import FoundationExtensions

@@ -13,6 +13,11 @@ extension Equated {
 
 extension Equated.Comparator {
 	@inlinable
+	public static func const(_ value: Bool) -> Self {
+		return .custom { _, _ in value }
+	}
+
+	@inlinable
 	public static func custom(_ compare: @escaping (Value, Value) -> Bool) -> Self {
 		return .init(compare: compare)
 	}
@@ -56,5 +61,11 @@ extension Equated.Comparator where Value: Error {
 	@inlinable
 	public static var localizedDescription: Self {
 		.property(\.localizedDescription)
+	}
+}
+
+extension Equated.Comparator: ExpressibleByBooleanLiteral {
+	public init(booleanLiteral value: Bool) {
+		self = .const(value)
 	}
 }

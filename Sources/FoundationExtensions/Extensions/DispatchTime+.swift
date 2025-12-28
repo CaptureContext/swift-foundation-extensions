@@ -8,7 +8,7 @@ extension DispatchTimeInterval {
 	}
 }
 
-extension DispatchTime: ExpressibleByFloatLiteral {
+extension DispatchTime: @retroactive ExpressibleByFloatLiteral {
 	/// Creates DispatchTime for the specified interval in seconds from `.now()`
 	@inlinable
 	public static func interval(_ interval: TimeInterval) -> DispatchTime {
