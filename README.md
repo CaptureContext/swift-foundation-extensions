@@ -1,10 +1,10 @@
 # swift-foundation-extensions
 
-[![CI](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/CaptureContext/swift-foundation-extensions/actions/workflows/ci.yml) [![SwiftPM 6.2](https://img.shields.io/badge/Swift-6.2_|_6.1-ED523F.svg?style=flat)](https://swift.org/download/) ![Platforms](https://img.shields.io/badge/Platforms-iOS_13_|_macOS_10.15_|_tvOS_14_|_watchOS_7-ED523F.svg?style=flat) [![@capture_context](https://img.shields.io/badge/contact-@capturecontext-1DA1F2.svg?style=flat&logo=twitter)](https://twitter.com/capture_context) 
+[![CI](https://github.com/capturecontext/swift-foundation-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/capturecontext/swift-foundation-extensions/actions/workflows/ci.yml) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fcapturecontext%2Fswift-foundation-extensions%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/capturecontext/swift-foundation-extensions) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fcapturecontext%2Fswift-foundation-extensions%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/capturecontext/swift-foundation-extensions)
 
 Standard extensions for Foundation framework
 
-- [Documentation](https://swiftpackageindex.com/CaptureContext/swift-foundation-extensions/0.5.0/documentation/foundationextensions)
+- [Documentation](https://swiftpackageindex.com/capturecontext/swift-foundation-extensions/0.5.0/documentation/foundationextensions)
 - [Contents](#contents)
   - [Coding](#coding)
   - [NSLocking](#nslocking)
@@ -139,7 +139,7 @@ More extensions can be found in sources.
 
 ### Equated
 
-> ⚠️
+> [!WARNING]
 >
 > `FoundationExtensions` simply exports `Equated` for backwards compatibility
 >
@@ -147,7 +147,7 @@ More extensions can be found in sources.
 
 ### Undo/Redo management
 
-> ⚠️
+> [!WARNING]
 >
 > `FoundationExtensions` simply exports `Resettable` for backwards compatibility
 >
@@ -155,7 +155,7 @@ More extensions can be found in sources.
 
 ### Object Association
 
-> ⚠️
+> [!WARNING]
 >
 > `FoundationExtensions` simply exports `AssociatedObjects`
 >
@@ -175,12 +175,12 @@ You can add FoundationExtensions to an Xcode project by adding it as a package d
 
 ### Recommended
 
-If you use SwiftPM for your project, you can add StandardExtensions to your package file.
+If you use SwiftPM for your project, you can add FoundationExtensions to your package file.
 
 ```swift
 .package(
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.6.0")
+  .upToNextMinor(from: "0.6.2")
 )
 ```
 
@@ -194,7 +194,7 @@ Do not forget about target dependencies:
 ```
 
 ```swift
-// Consider depending on swift-associated-objects package instead
+// Consider depending on swift-associated-objects package directly instead
 .product(
   name: "FoundationExtensionsMacros", 
   package: "swift-foundation-extensions"
@@ -203,4 +203,4 @@ Do not forget about target dependencies:
 
 ## License
 
-This library is released under the MIT license. See [LICENCE](LICENCE) for details.
+This library is released under the MIT license. See [LICENSE](LICENSE) for details.
