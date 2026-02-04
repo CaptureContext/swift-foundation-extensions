@@ -1,5 +1,20 @@
 version: 1
 builder:
-  configs:
-  - documentation_targets: [FoundationExtensions]
-    swift_version: 5.9
+	configs:
+	- platform: ios
+		scheme: FoundationExtensions
+	- platform: macos-xcodebuild
+		scheme: FoundationExtensions
+	- platform: tvos
+		scheme: FoundationExtensions
+	- platform: watchos
+		scheme: FoundationExtensions
+	- platform: linux
+		scheme: FoundationExtensions
+		swift_version: '6.0'
+	- platform: linux
+		scheme: FoundationExtensions
+		swift_version: '5.9'
+
+	- documentation_targets:
+		- FoundationExtensions
