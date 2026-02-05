@@ -9,7 +9,7 @@ let package = Package(
 		.macCatalyst(.v13),
 		.iOS(.v13),
 		.tvOS(.v13),
-		.watchOS(.v6)
+		.watchOS(.v6),
 	],
 	products: [
 		.library(
@@ -32,7 +32,7 @@ let package = Package(
 		),
 		.package(
 			url: "https://github.com/capturecontext/swift-associated-objects.git",
-			.upToNextMinor(from: "0.2.0")
+			.upToNextMinor(from: "0.2.2")
 		)
 	],
 	targets: [
