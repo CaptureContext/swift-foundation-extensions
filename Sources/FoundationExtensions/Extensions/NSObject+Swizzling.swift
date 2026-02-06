@@ -1,3 +1,4 @@
+#if canImport(Darwin) && canImport(ObjectiveC)
 public protocol NSObjectSwizzlingProtocol: NSObjectProtocol {}
 extension NSObjectSwizzlingProtocol {
 	/// Exchanges implementation of objc methods
@@ -118,3 +119,4 @@ extension NSObjectSwizzlingProtocol {
 }
 
 extension NSObject: NSObjectSwizzlingProtocol {}
+#endif

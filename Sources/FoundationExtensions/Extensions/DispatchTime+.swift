@@ -1,4 +1,5 @@
-import Foundation
+#if canImport(Dispatch)
+import Dispatch
 
 extension DispatchTimeInterval {
 	/// Creates DispatchTimeInterval.nanoseconds for the specified interval in seconds
@@ -26,3 +27,4 @@ extension DispatchTime {
 		self = .interval(value)
 	}
 }
+#endif
