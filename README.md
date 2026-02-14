@@ -17,7 +17,7 @@ Standard extensions for Foundation framework
 - [Installation](#installation)
   - [Basic](#basic)
   - [Recommended](#recommended)
-- [Licence](#licence)
+- [License](#license)
 
 ## Contents
 
@@ -98,6 +98,10 @@ view.text = "Hello, World!"
 
 This package also provides some sugar for objc method swizzling
 
+> [!NOTE]
+>
+> _The package is compatible with non-Apple platforms, however it uses conditional compilation, so **`Swizzling` APIs are only available on Apple platforms**_
+
 ```swift
 extension UIViewController {
   // Runs once in app lifetime
@@ -167,36 +171,28 @@ More extensions can be found in sources.
 
 ### Basic
 
-You can add FoundationExtensions to an Xcode project by adding it as a package dependency.
+You can add `swift-foundation-extensions` to an Xcode project by adding it as a package dependency.
 
 1. From the **File** menu, select **Swift Packages › Add Package Dependency…**
-2. Enter [`"https://github.com/capturecontext/swift-foundation-extensions.git"`](https://github.com/capturecontext/swift-foundation-extensions.git) into the package repository URL text field
-3. Choose products you need to link them to your project.
+2. Enter [`"https://github.com/capturecontext/swift-foundation-extensions"`](https://github.com/capturecontext/swift-foundation-extensions) into the package repository URL text field
+3. Choose products you need to link to your project.
 
 ### Recommended
 
-If you use SwiftPM for your project, you can add FoundationExtensions to your package file.
+If you use SwiftPM for your project structure, add `swift-foundation-extensions` dependency to your package file
 
 ```swift
 .package(
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor(from: "0.6.2")
+  .upToNextMinor("0.6.9")
 )
 ```
 
-Do not forget about target dependencies:
+Do not forget about target dependencies
 
 ```swift
 .product(
-  name: "FoundationExtensions", 
-  package: "swift-foundation-extensions"
-)
-```
-
-```swift
-// Consider depending on swift-associated-objects package directly instead
-.product(
-  name: "FoundationExtensionsMacros", 
+  name: "<#Product#>", 
   package: "swift-foundation-extensions"
 )
 ```
