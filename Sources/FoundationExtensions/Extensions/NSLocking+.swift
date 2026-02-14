@@ -43,6 +43,12 @@ extension NSLocking {
 	@discardableResult
 	@inlinable
 	public func execute<T>(_ closure: () -> T) -> T {
+		#if canImport(Darwin)
 		withLock(closure)
+		#else
+		lock()
+		defer { unlock() }
+		return closure()
+		#endif
 	}
 }
