@@ -184,7 +184,7 @@ If you use SwiftPM for your project structure, add `swift-foundation-extensions`
 ```swift
 .package(
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor("0.6.9")
+  .upToNextMinor("0.7.0")
 )
 ```
 
