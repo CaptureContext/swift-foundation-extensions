@@ -1,4 +1,5 @@
 @preconcurrency import Foundation
+import IssueReporting
 
 extension Notification.Name {
 	@available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
