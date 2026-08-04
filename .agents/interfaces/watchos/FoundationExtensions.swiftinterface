@@ -1,0 +1,820 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-watchos6.0-simulator -enable-objc-interop -swift-version 6 -O -module-name FoundationExtensions -package-name swift_foundation_extensions
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+@_exported import AssociatedObjects
+import Combine
+import Dispatch
+@_exported import Equated
+@_exported @preconcurrency import Foundation
+@_exported import Resettable
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension Swift.ClosedRange {
+  @available(*, deprecated, message: "Use value.clamped(in: range) instead")
+  @inlinable public func clamped(_ value: Bound) -> Bound {
+		if value < lowerBound {
+			return lowerBound
+		} else if value > upperBound {
+			return upperBound
+		} else {
+			return value
+		}
+	}
+}
+extension Swift.PartialRangeFrom {
+  @available(*, deprecated, message: "Use value.clamped(in: range) instead")
+  @inlinable public func clamped(_ value: Bound) -> Bound {
+		if value < lowerBound {
+			return lowerBound
+		} else {
+			return value
+		}
+	}
+}
+extension Swift.PartialRangeThrough {
+  @available(*, deprecated, message: "Use value.clamped(in: range) instead")
+  @inlinable public func clamped(_ value: Bound) -> Bound {
+		if value > upperBound {
+			return upperBound
+		} else {
+			return value
+		}
+	}
+}
+@available(*, deprecated, renamed: "Optional.UnwrappingError", message: "Use Optional<Wrapped>.UnwrappingError instead")
+public typealias UnwrappingError<T> = Swift.Optional<T>.UnwrappingError
+extension Swift.Optional.UnwrappingError {
+  @available(*, deprecated, message: "Instead of UnwrappingError<T>, use Optional<Wrapped>.UnwrappingError")
+  public typealias T = Wrapped
+}
+extension Foundation.Bundle {
+  @inlinable public var appVersionNumber: Swift.String? {
+    get { infoDictionary?["CFBundleShortVersionString"] as? String }
+  }
+  @inlinable public var buildVersionNumber: Swift.String? {
+    get { infoDictionary?["CFBundleVersion"] as? String }
+  }
+  @inlinable public var teamIdentifierPrefix: Swift.String? {
+    get { infoDictionary?["TeamIdentifierPrefix"] as? String }
+  }
+  @inlinable public var keyPrefix: Swift.String {
+    get {
+		return bundleIdentifier.map { $0.appending(".") }.or("")
+	}
+  }
+  @inlinable public func makeKey(_ key: Swift.String) -> Swift.String {
+		return keyPrefix.appending(key)
+	}
+  @inlinable public func appGroupID(for teamIdentifier: Swift.String) -> Swift.String? {
+		return teamIdentifierPrefix.map { "\($0)\(teamIdentifier)" }
+	}
+}
+public enum RawCodingKey : Swift.CodingKey, Swift.ExpressibleByStringLiteral, Swift.ExpressibleByIntegerLiteral {
+  case key(Swift.String)
+  case index(Swift.Int)
+  @inlinable public init(stringLiteral value: Swift.String) {
+		self.init(stringValue: value)
+	}
+  @inlinable public init(stringValue: Swift.String) {
+		self = .key(stringValue)
+	}
+  @inlinable public init(integerLiteral value: Swift.Int) {
+		self.init(intValue: value)
+	}
+  @inlinable public init(intValue: Swift.Int) {
+		self = .index(intValue)
+	}
+  @inlinable public var stringValue: Swift.String {
+    get {
+		switch self {
+		case let .key(value):
+			return value
+		case let .index(value):
+			return value.description
+		}
+	}
+  }
+  @inlinable public var intValue: Swift.Int? {
+    get {
+		switch self {
+		case let .index(value):
+			return value
+		default:
+			return nil
+		}
+	}
+  }
+  public typealias ExtendedGraphemeClusterLiteralType = Swift.String
+  public typealias IntegerLiteralType = Swift.Int
+  public typealias StringLiteralType = Swift.String
+  public typealias UnicodeScalarLiteralType = Swift.String
+}
+extension Swift.Decoder {
+  @inlinable public func decode<T>(_ decode: (Swift.KeyedDecodingContainer<FoundationExtensions.RawCodingKey>) throws -> T) throws -> T {
+		return try self.decode(RawCodingKey.self, decode)
+	}
+  @inlinable public func decode<CodingKeys, T>(_ codingKeys: CodingKeys.Type, _ decode: (Swift.KeyedDecodingContainer<CodingKeys>) throws -> T) throws -> T where CodingKeys : Swift.CodingKey {
+		let container = try container(keyedBy: codingKeys)
+		return try decode(container)
+	}
+}
+extension Swift.Encoder {
+  @inlinable public func encode<T>(_ encode: (inout Swift.KeyedEncodingContainer<FoundationExtensions.RawCodingKey>) throws -> T) throws -> T {
+		return try self.encode(RawCodingKey.self, encode)
+	}
+  @inlinable public func encode<CodingKeys, T>(_ codingKeys: CodingKeys.Type, _ encode: (inout Swift.KeyedEncodingContainer<CodingKeys>) throws -> T) throws -> T where CodingKeys : Swift.CodingKey {
+		var container = container(keyedBy: codingKeys)
+		return try encode(&container)
+	}
+}
+extension Swift.KeyedDecodingContainer {
+  @inlinable public func decode<T>(_ key: K) throws -> T where T : Swift.Decodable {
+		try decode(T.self, forKey: key)
+	}
+  @inlinable public func decodeIfPresent<T>(_ key: K) throws -> T? where T : Swift.Decodable {
+		try decodeIfPresent(T.self, forKey: key)
+	}
+}
+extension Swift.Collection {
+  @inlinable public var isNotEmpty: Swift.Bool {
+    get { !self.isEmpty }
+  }
+}
+extension Swift.Array {
+  @inlinable public mutating func bringFront(elementsSatisfying predicate: (Element) -> Swift.Bool) {
+		let leftHalf = self.filter { predicate($0) }
+		let rightHalf = self.filter { !predicate($0) }
+		self = leftHalf + rightHalf
+	}
+}
+extension Swift.MutableCollection {
+  @inlinable public subscript(safe index: Self.Index?) -> Self.Element? {
+    get {
+			guard let index = index else { return nil }
+			return self[safe: index]
+		}
+    set {
+			guard let index = index else { return }
+			self[safe: index] = newValue
+		}
+  }
+  @inlinable public subscript(safe index: Self.Index) -> Self.Element? {
+    get {
+			guard indices.contains(index)
+			else { return nil }
+			return self[index]
+		}
+    set {
+			guard
+				indices.contains(index),
+				let value = newValue
+			else { return }
+			return self[index] = value
+		}
+  }
+}
+extension Swift.Collection {
+  @inlinable public subscript(safe index: Self.Index?) -> Self.Element? {
+    get {
+			guard let index = index else { return nil }
+			return self[safe: index]
+		}
+  }
+  @inlinable public subscript(safe index: Self.Index) -> Self.Element? {
+    get {
+			guard indices.contains(index)
+			else { return nil }
+			return self[index]
+		}
+  }
+}
+extension Swift.Comparable {
+  @inlinable public func clamped(in range: Swift.ClosedRange<Self>) -> Self {
+		min(max(range.lowerBound, self), range.upperBound)
+	}
+  @inlinable public mutating func clamp(in range: Swift.ClosedRange<Self>) {
+		self = self.clamped(in: range)
+	}
+  @inlinable public func clamped(in range: Swift.PartialRangeFrom<Self>) -> Self {
+		max(range.lowerBound, self)
+	}
+  @inlinable public mutating func clamp(in range: Swift.PartialRangeFrom<Self>) {
+		self = self.clamped(in: range)
+	}
+  @inlinable public func clamped(in range: Swift.PartialRangeThrough<Self>) -> Self {
+		min(self, range.upperBound)
+	}
+  @inlinable public mutating func clamp(in range: Swift.PartialRangeThrough<Self>) {
+		self = self.clamped(in: range)
+	}
+}
+extension Dispatch.DispatchTimeInterval {
+  @inlinable public static func interval(_ value: Foundation.TimeInterval) -> Dispatch.DispatchTimeInterval {
+		return .nanoseconds(Int(value * pow(10, 9)))
+	}
+}
+extension Dispatch.DispatchTime : @retroactive Swift.ExpressibleByFloatLiteral {
+  public typealias FloatLiteralType = Foundation.TimeInterval
+}
+extension Dispatch.DispatchTime {
+  @inlinable public static func interval(_ interval: Foundation.TimeInterval) -> Dispatch.DispatchTime {
+		return .now() + .interval(interval)
+	}
+  @inlinable public init(floatLiteral value: Foundation.TimeInterval) {
+		self = .interval(value)
+	}
+}
+extension Swift.FloatingPoint {
+  @inlinable public func progress(in total: Self) -> Self {
+		total != 0 ? self / total : 0
+	}
+}
+extension Foundation.NSMutableAttributedString {
+  @inlinable public func addAttribute(_ key: Foundation.NSAttributedString.Key, value: Any) {
+		addAttribute(key, value: value, range: NSRange(0..<length))
+	}
+}
+extension Foundation.NSAttributedString {
+  @inlinable public func mapRegex(_ regex: Foundation.NSRegularExpression, _ transform: (Foundation.NSMutableAttributedString, Foundation.NSRange) -> Swift.Void) -> Foundation.NSAttributedString {
+		let attributedString = NSMutableAttributedString(attributedString: self)
+		let range = NSRange(0..<length)
+		let ranges = regex
+			.matches(in: string, options: [], range: range)
+			.map(\.range)
+		
+		ranges.forEach { range in
+			transform(
+				attributedString,
+				range
+			)
+		}
+		
+		return attributedString
+	}
+  @inlinable public func mapRegex(_ regex: Foundation.NSRegularExpression, at groupIndex: Swift.Int, _ transform: (Foundation.NSMutableAttributedString, Foundation.NSRange) -> Swift.Void) -> Foundation.NSAttributedString {
+		let attributedString = NSMutableAttributedString(attributedString: self)
+		let range = NSRange(0..<length)
+		let ranges = regex
+			.matches(in: string, options: [], range: range)
+			.map { $0.range(at: groupIndex) }
+		
+		ranges.forEach { range in
+			transform(
+				attributedString,
+				range
+			)
+		}
+		
+		return attributedString
+	}
+}
+extension Foundation.NSLocking {
+  @inlinable public func store<T>(_ value: T, in object: inout T) {
+		mutate(&object, with: { $0 = value })
+	}
+  @inlinable public func mutate<T>(_ object: T, with closure: (T) -> Swift.Void) where T : AnyObject {
+		execute { closure(object) }
+	}
+  @inlinable public func mutate<T>(_ object: inout T, with closure: (inout T) -> Swift.Void) {
+		execute { closure(&object) }
+	}
+  @inlinable public func assign<T, Value>(_ value: Value, to keyPath: Swift.ReferenceWritableKeyPath<T, Value>, on object: T) where T : AnyObject {
+		execute { object[keyPath: keyPath] = value }
+	}
+  @inlinable public func assign<T, Value>(_ value: Value, to keyPath: Swift.WritableKeyPath<T, Value>, on object: inout T) {
+		execute { object[keyPath: keyPath] = value }
+	}
+  @discardableResult
+  @inlinable public func execute<T>(_ closure: () -> T) -> T {
+		withLock(closure)
+	}
+}
+public protocol NSObjectSwizzlingProtocol : ObjectiveC.NSObjectProtocol {
+}
+extension FoundationExtensions.NSObjectSwizzlingProtocol {
+  @available(*, deprecated, message: "Use `objc_exchangeImplementations(_,_,_)` instead")
+  @inlinable public static func objc_exchangeImplementations(_ originalSelector: ObjectiveC.Selector, _ swizzledSelector: ObjectiveC.Selector) {
+		objc_exchangeImplementations(
+			originalSelector,
+			swizzledSelector,
+			using: class_getInstanceMethod
+		)
+	}
+  @discardableResult
+  @inlinable public static func objc_exchangeImplementations(_ originalSelector: ObjectiveC.Selector, _ swizzledSelector: ObjectiveC.Selector, using extractMethod: (Swift.AnyClass?, ObjectiveC.Selector) -> ObjectiveC.Method?) -> Swift.Bool {
+		let originalMethod = extractMethod(
+			Self.self,
+			originalSelector
+		)
+
+		let swizzledMethod = extractMethod(
+			Self.self,
+			swizzledSelector
+		)
+
+		guard
+			let originalMethod,
+			let swizzledMethod
+		else { return false }
+
+		method_exchangeImplementations(originalMethod, swizzledMethod)
+		return true
+	}
+}
+extension ObjectiveC.NSObject : FoundationExtensions.NSObjectSwizzlingProtocol {
+}
+extension Swift.Optional {
+  @inlinable public func orThrow(_ error: @autoclosure () -> any Swift.Error) throws -> Wrapped {
+		switch self {
+		case .some(let wrapped):
+			return wrapped
+		case .none:
+			throw error()
+		}
+	}
+  @inlinable public var isNil: Swift.Bool {
+    get {
+		switch self {
+		case .none: return true
+		case .some: return false
+		}
+	}
+  }
+  @inlinable public var isNotNil: Swift.Bool {
+    get { !isNil }
+  }
+  @inlinable public func or(_ value: @autoclosure () -> Wrapped) -> Wrapped {
+		self ?? value()
+	}
+  @inlinable public func or(_ value: @autoclosure () -> Wrapped?) -> Wrapped? {
+		self ?? value()
+	}
+  @inlinable public func unwrap(function: Swift.String = #function, file: Swift.String = #file, line: Swift.Int = #line) -> Swift.Result<Wrapped, Swift.Optional<Wrapped>.UnwrappingError> {
+		switch self {
+		case .some(let value):
+			return .success(value)
+		case .none:
+			return .failure(
+				UnwrappingError(
+					function: function,
+					file: file,
+					line: line
+				)
+			)
+		}
+	}
+  @inlinable public func assign<T>(to keyPath: Swift.ReferenceWritableKeyPath<T, Swift.Optional<Wrapped>>, on target: T) where T : AnyObject { target[keyPath: keyPath] = self }
+  @inlinable public func ifLetAssign<T>(to keyPath: Swift.ReferenceWritableKeyPath<T, Wrapped>, on target: T) where T : AnyObject { map { target[keyPath: keyPath] = $0 } }
+  @inlinable public func ifLetAssign<T>(to keyPath: Swift.ReferenceWritableKeyPath<T, Swift.Optional<Wrapped>>, on target: T) where T : AnyObject { map { target[keyPath: keyPath] = $0 } }
+  @inlinable public func assign<T>(to keyPath: Swift.WritableKeyPath<T, Swift.Optional<Wrapped>>, on target: inout T) { target[keyPath: keyPath] = self }
+  @inlinable public func ifLetAssign<T>(to keyPath: Swift.WritableKeyPath<T, Wrapped>, on target: inout T) { map { target[keyPath: keyPath] = $0 } }
+  @inlinable public func ifLetAssign<T>(to keyPath: Swift.WritableKeyPath<T, Swift.Optional<Wrapped>>, on target: inout T) { map { target[keyPath: keyPath] = $0 } }
+}
+extension Swift.Optional where Wrapped : Swift.Collection {
+  @inlinable public var isNilOrEmpty: Swift.Bool {
+    get {
+		map(\.isEmpty).or(true)
+	}
+  }
+}
+extension Swift.Optional {
+  public struct UnwrappingError : Swift.Error {
+    public let type: Wrapped.Type
+    public let function: Swift.String
+    public let file: Swift.String
+    public let line: Swift.Int
+    public init(_ type: Wrapped.Type = Wrapped.self, function: Swift.String = #function, file: Swift.String = #file, line: Swift.Int = #line)
+    @inlinable public var debugDescription: Swift.String {
+      get {
+			localizedDescription
+				.appending("\n{")
+				.appending("\n    function: \(function)")
+				.appending("\n    file: \(file),")
+				.appending("\n    line: \(line)")
+				.appending("\n}")
+		}
+    }
+  }
+}
+extension Swift.Range where Bound : Swift.Numeric {
+  @inlinable public var length: Bound {
+    get { upperBound - lowerBound }
+  }
+}
+extension Swift.ClosedRange where Bound : Swift.Numeric {
+  @inlinable public var length: Bound {
+    get { upperBound - lowerBound }
+  }
+}
+extension Swift.Result {
+  @inlinable public var value: Success? {
+    get {
+		switch self {
+		case let .success(value): return value
+		default: return nil
+		}
+	}
+  }
+  @inlinable public var error: Failure? {
+    get {
+		switch self {
+		case let .failure(error): return error
+		default: return nil
+		}
+	}
+  }
+  @inlinable public func eraseError() -> Swift.Result<Success, any Swift.Error> {
+		mapError { $0 as Error }
+	}
+  @inlinable public func replaceError(with success: Success) -> Swift.Result<Success, Swift.Never> {
+		replaceError { _ in success }
+	}
+  @inlinable public func replaceError(with closure: (any Swift.Error) -> Success) -> Swift.Result<Success, Swift.Never> {
+		switch self {
+		case .success(let value):
+			return .success(value)
+		case .failure(let error):
+			return .success(closure(error))
+		}
+	}
+}
+extension Swift.String {
+  @inlinable public func ranges(of substring: Swift.String, options: Swift.String.CompareOptions = [], locale: Foundation.Locale? = nil) -> [Swift.Range<Swift.String.Index>] {
+		var ranges: [Range<Index>] = []
+		while
+			let range = range(
+				of: substring,
+				options: options,
+				range: (ranges.last?.upperBound ?? startIndex)..<endIndex,
+				locale: locale
+			) {
+			ranges.append(range)
+		}
+		return ranges
+	}
+}
+@propertyWrapper @dynamicMemberLookup final public class Box<Content> {
+  final public var content: Content
+  @inlinable final public var wrappedValue: Content {
+    get { content }
+    set { content = newValue }
+  }
+  @inlinable convenience public init<T>() where Content == T? {
+		self.init(wrappedValue: nil)
+	}
+  @inlinable convenience public init(_ wrappedValue: Content) {
+		self.init(wrappedValue: wrappedValue)
+	}
+  public init(wrappedValue: Content)
+  @inlinable final public var projectedValue: FoundationExtensions.Reference<Content> {
+    get { reference }
+  }
+  @inlinable final public var reference: FoundationExtensions.Reference<Content> {
+    get {
+		.object(self, keyPath: \.wrappedValue)
+	}
+  }
+  @inlinable final public subscript<U>(dynamicMember keyPath: Swift.KeyPath<Content, U>) -> U {
+    get { self.wrappedValue[keyPath: keyPath] }
+  }
+  @inlinable final public subscript<U>(dynamicMember keyPath: Swift.WritableKeyPath<Content, U>) -> U {
+    get { self.wrappedValue[keyPath: keyPath] }
+    set { self.wrappedValue[keyPath: keyPath] = newValue }
+  }
+  @inlinable final public subscript<U>(dynamicMember keyPath: Swift.ReferenceWritableKeyPath<Content, U>) -> U {
+    get { self.wrappedValue[keyPath: keyPath] }
+    set { self.wrappedValue[keyPath: keyPath] = newValue }
+  }
+  @objc deinit
+}
+extension FoundationExtensions.ReadonlyReference {
+  @inlinable public static func constant(_ value: Value) -> FoundationExtensions.ReadonlyReference<Value> {
+		ReadonlyReference { value }
+	}
+  @inlinable public static func object<Object>(_ object: Object, read: @escaping (Object) -> Value) -> FoundationExtensions.ReadonlyReference<Value> where Object : AnyObject {
+		ReadonlyReference(read: { read(object) })
+	}
+}
+@propertyWrapper @dynamicMemberLookup public struct ReadonlyReference<Value> {
+  @usableFromInline
+  internal var _read: () -> Value
+  @inlinable public init(wrappedValue: Value) {
+		self.init(read: { wrappedValue })
+	}
+  public init(read: @escaping () -> Value)
+  @inlinable public var wrappedValue: Value {
+    get {
+		self._read()
+	}
+  }
+  @inlinable public var projectedValue: FoundationExtensions.ReadonlyReference<Value> {
+    get {
+		ReadonlyReference(read: _read)
+	}
+  }
+  @inlinable public var asWritable: FoundationExtensions.Reference<Value> {
+    get {
+		Reference(read: _read, write: { _ in })
+	}
+  }
+  @inlinable public func writable(with write: @escaping (Value) -> Swift.Void) -> FoundationExtensions.Reference<Value> {
+		Reference(read: _read, write: write)
+	}
+  @inlinable public subscript<LocalValue>(dynamicMember keyPath: Swift.KeyPath<Value, LocalValue>) -> FoundationExtensions.Reference<LocalValue> {
+    get {
+		.readonly { wrappedValue[keyPath: keyPath] }
+	}
+  }
+  @inlinable public subscript<LocalValue>(dynamicMember keyPath: Swift.ReferenceWritableKeyPath<Value, LocalValue>) -> FoundationExtensions.Reference<LocalValue> {
+    get {
+		Reference(
+			read: { _read()[keyPath: keyPath] },
+			write: { _read()[keyPath: keyPath] = $0 })
+	}
+  }
+}
+extension FoundationExtensions.Reference {
+  @inlinable public static func readonly(_ read: @escaping () -> Value) -> FoundationExtensions.Reference<Value> {
+		Reference(read: read, write: { _ in })
+	}
+  @inlinable public static func object<Object>(_ object: Object, read: @escaping (Object) -> Value) -> FoundationExtensions.Reference<Value> where Object : AnyObject {
+		.readonly { read(object) }
+	}
+  @inlinable public static func object<Object>(_ object: Object, keyPath: Swift.ReferenceWritableKeyPath<Object, Value>) -> FoundationExtensions.Reference<Value> where Object : AnyObject {
+		Reference(
+			read: { object[keyPath: keyPath] },
+			write: { object[keyPath: keyPath] = $0 }
+		)
+	}
+  @inlinable public static func variable(_ initialValue: Value) -> FoundationExtensions.Reference<Value> {
+		Reference(wrappedValue: initialValue)
+	}
+  @inlinable public static func constant(_ value: Value) -> FoundationExtensions.Reference<Value> {
+		.readonly { value }
+	}
+}
+@propertyWrapper @dynamicMemberLookup public struct Reference<Value> {
+  @usableFromInline
+  internal var _read: () -> Value
+  @usableFromInline
+  internal var _write: (Value) -> Swift.Void
+  @inlinable public init(wrappedValue: Value) {
+		var value = wrappedValue
+		self.init(
+			read: { value },
+			write: { value = $0 }
+		)
+	}
+  public init(read: @escaping () -> Value, write: @escaping (Value) -> Swift.Void)
+  @inlinable public func read() -> Value { _read() }
+  @inlinable public func write(_ value: Value) { _write(value) }
+  @inlinable public var wrappedValue: Value {
+    get { _read() }
+    nonmutating set { _write(newValue) }
+  }
+  @inlinable public var projectedValue: FoundationExtensions.Reference<Value> {
+    get {
+		Reference(read: _read, write: _write)
+	}
+  }
+  @inlinable public var readonly: FoundationExtensions.ReadonlyReference<Value> {
+    get { ReadonlyReference(read: _read) }
+  }
+  @inlinable public subscript<LocalValue>(dynamicMember keyPath: Swift.KeyPath<Value, LocalValue>) -> FoundationExtensions.Reference<LocalValue> {
+    get {
+		.readonly { wrappedValue[keyPath: keyPath] }
+	}
+  }
+  @inlinable public subscript<LocalValue>(dynamicMember keyPath: Swift.WritableKeyPath<Value, LocalValue>) -> FoundationExtensions.Reference<LocalValue> {
+    get {
+		Reference<LocalValue>(
+			read: { _read()[keyPath: keyPath] },
+			write: { localValue in
+				var value = _read()
+				value[keyPath: keyPath] = localValue
+				_write(value)
+			}
+		)
+	}
+  }
+}
+extension FoundationExtensions.Reference {
+  public func map<T>(read: @escaping (Value) -> T, write: @escaping (T) -> Value) -> FoundationExtensions.Reference<T>
+  public func onSet(perform action: @escaping (Value) -> Swift.Void) -> FoundationExtensions.Reference<Value>
+  public func onChange(perform action: @escaping (Value) -> Swift.Void) -> FoundationExtensions.Reference<Value> where Value : Swift.Equatable
+}
+public protocol ReferenceProvider : AnyObject {
+}
+extension FoundationExtensions.ReferenceProvider {
+  @inlinable public func reference<Value>(for keyPath: Swift.KeyPath<Self, Value>) -> FoundationExtensions.ReadonlyReference<Value> {
+		.object(self, read: { $0[keyPath: keyPath] })
+	}
+  @inlinable public func reference<Value>(for keyPath: Swift.ReferenceWritableKeyPath<Self, Value>) -> FoundationExtensions.Reference<Value> {
+		.object(self, keyPath: keyPath)
+	}
+}
+extension ObjectiveC.NSObject : FoundationExtensions.ReferenceProvider {
+}
+public protocol Castable {
+  func `as`<T>(_ type: T.Type) -> T?
+  func `is`<T>(_ type: T.Type) -> Swift.Bool
+}
+extension FoundationExtensions.Castable {
+  public func `as`<T>(_ type: T.Type) -> T?
+  public func `is`<T>(_ type: T.Type) -> Swift.Bool
+}
+extension Swift.Optional : FoundationExtensions.Castable {
+}
+extension ObjectiveC.NSObject : FoundationExtensions.Castable {
+}
+@propertyWrapper @dynamicMemberLookup public struct Indirect<Value> {
+  @usableFromInline
+  internal class Storage : @unchecked Swift.Sendable {
+    @usableFromInline
+    internal var value: Value
+    @usableFromInline
+    internal init(_ value: Value)
+    @objc @usableFromInline
+    deinit
+  }
+  @usableFromInline
+  internal var storage: FoundationExtensions.Indirect<Value>.Storage
+  @inlinable public init(_ value: Value) {
+		self.init(wrappedValue: value)
+	}
+  @inlinable public init(wrappedValue: Value) {
+		self.storage = .init(wrappedValue)
+	}
+  @inlinable public var wrappedValue: Value {
+    get { storage.value }
+    set {
+			if !isKnownUniquelyReferenced(&storage) {
+				storage = Storage(storage.value)
+			}
+			storage.value = newValue
+		}
+  }
+  @inlinable public var projectedValue: FoundationExtensions.Indirect<Value> {
+    get { self }
+    set { self = newValue }
+  }
+  @inlinable public subscript<T>(dynamicMember keyPath: Swift.KeyPath<Value, T>) -> T {
+    get {
+		wrappedValue[keyPath: keyPath]
+	}
+  }
+  @inlinable public subscript<T>(dynamicMember keyPath: Swift.WritableKeyPath<Value, T>) -> T {
+    get { wrappedValue[keyPath: keyPath] }
+    set { wrappedValue[keyPath: keyPath] = newValue }
+  }
+  @inlinable public func _setValue(_ value: Value) {
+		storage.value = value
+	}
+  @inlinable public func _modifyValue(_ transform: (inout Value) -> Swift.Void) {
+		transform(&storage.value)
+	}
+  @inlinable public func _sharesStorage(with other: FoundationExtensions.Indirect<Value>) -> Swift.Bool {
+		storage === other.storage
+	}
+}
+extension FoundationExtensions.Indirect : Swift.Sendable where Value : Swift.Sendable {
+}
+extension FoundationExtensions.Indirect : Swift.Equatable where Value : Swift.Equatable {
+  @inlinable public static func == (lhs: FoundationExtensions.Indirect<Value>, rhs: FoundationExtensions.Indirect<Value>) -> Swift.Bool {
+		lhs.wrappedValue == rhs.wrappedValue
+	}
+}
+extension FoundationExtensions.Indirect : Swift.Hashable where Value : Swift.Hashable {
+  @inlinable public func hash(into hasher: inout Swift.Hasher) {
+		wrappedValue.hash(into: &hasher)
+	}
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension FoundationExtensions.Indirect : Swift.Comparable where Value : Swift.Comparable {
+  @inlinable public static func < (lhs: FoundationExtensions.Indirect<Value>, rhs: FoundationExtensions.Indirect<Value>) -> Swift.Bool {
+		lhs.wrappedValue < rhs.wrappedValue
+	}
+}
+extension FoundationExtensions.Indirect : Swift.Decodable where Value : Swift.Decodable {
+  @inlinable public init(from decoder: any Swift.Decoder) throws {
+		try self.init(.init(from: decoder))
+	}
+}
+extension FoundationExtensions.Indirect : Swift.Encodable where Value : Swift.Encodable {
+  @inlinable public func encode(to encoder: any Swift.Encoder) throws {
+		try wrappedValue.encode(to: encoder)
+	}
+}
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension FoundationExtensions.Indirect : Swift.Identifiable where Value : Swift.Identifiable {
+  @inlinable public var id: Value.ID {
+    get { wrappedValue.id }
+  }
+  @available(iOS 13, tvOS 13, watchOS 6, macOS 10.15, *)
+  public typealias ID = Value.ID
+}
+@propertyWrapper public struct PropertyProxy<Object, Value> where Object : AnyObject {
+  public static subscript(_enclosingInstance instance: Object, wrapped wrappedKeyPath: Swift.ReferenceWritableKeyPath<Object, Value>, storage storageKeyPath: Swift.ReferenceWritableKeyPath<Object, FoundationExtensions.PropertyProxy<Object, Value>>) -> Value {
+    get
+    set
+  }
+  private let keyPath: Swift.ReferenceWritableKeyPath<Object, Value>
+  @available(*, unavailable, message: "@PropertyProxy can only be applied to classes")
+  public var wrappedValue: Value {
+    get
+    set
+  }
+  public init(_ keyPath: Swift.ReferenceWritableKeyPath<Object, Value>)
+}
+@propertyWrapper public struct ReadonlyPropertyProxy<Object, Value> where Object : AnyObject {
+  public static subscript(_enclosingInstance instance: Object, wrapped wrappedKeyPath: Swift.KeyPath<Object, Value>, storage storageKeyPath: Swift.KeyPath<Object, FoundationExtensions.ReadonlyPropertyProxy<Object, Value>>) -> Value {
+    get
+  }
+  private let keyPath: Swift.KeyPath<Object, Value>
+  @available(*, unavailable, message: "@PropertyProxy can only be applied to classes")
+  public var wrappedValue: Value {
+    get
+    set
+  }
+  public init(_ keyPath: Swift.KeyPath<Object, Value>)
+}
+extension Foundation.NSNotification.Name {
+  @available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
+  @_hasInitialValue public static let foundationExtensionsRuntimeWarning: Foundation.NSNotification.Name
+}
+@available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
+@_transparent @inlinable @inline(__always) public func runtimeWarn(_ message: @autoclosure () -> Swift.String, category: Swift.String? = "FoundationExtensions", notificationName: Foundation.Notification.Name? = .foundationExtensionsRuntimeWarning) {
+}
+@_hasInitialValue public let isTesting: Swift.Bool
+public struct USID : Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.ExpressibleByStringLiteral, Swift.ExpressibleByStringInterpolation, Swift.LosslessStringConvertible {
+  public let rawValue: Swift.String
+  @inlinable public init(_ uuid: Foundation.UUID = .init()) {
+		self.init(uuid.uuidString)
+	}
+  @inlinable public init(stringLiteral value: Swift.String) {
+		self.init(value)
+	}
+  @inlinable public init(_ value: Swift.String) {
+		self.init(rawValue: value)
+	}
+  @inlinable public init(usidString value: Swift.String) {
+		self.init(rawValue: value)
+	}
+  @inlinable public init(rawValue value: Swift.String) {
+		self.rawValue = value
+	}
+  @inlinable public var description: Swift.String {
+    get { rawValue }
+  }
+  @inlinable public var usidString: Swift.String {
+    get { rawValue }
+  }
+  @inlinable public var intValue: Swift.Int? {
+    get { Int(rawValue) }
+  }
+  @inlinable public var uuidValue: Foundation.UUID? {
+    get { UUID(uuidString: rawValue) }
+  }
+  public typealias ExtendedGraphemeClusterLiteralType = Swift.String
+  public typealias RawValue = Swift.String
+  public typealias StringInterpolation = Swift.DefaultStringInterpolation
+  public typealias StringLiteralType = Swift.String
+  public typealias UnicodeScalarLiteralType = Swift.String
+}
+extension FoundationExtensions.USID : Swift.Codable {
+  @inlinable public init(from decoder: any Swift.Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		self.init(rawValue: try container.decode(String.self))
+	}
+  @inlinable public func encode(to encoder: any Swift.Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(rawValue)
+	}
+}
+extension FoundationExtensions.USID : Swift.ExpressibleByIntegerLiteral {
+  @inlinable public init(integerLiteral value: Swift.Int) {
+		self = .describing(value)
+	}
+  public typealias IntegerLiteralType = Swift.Int
+}
+extension FoundationExtensions.USID {
+  @inlinable public static func describing<Value>(_ value: Value) -> FoundationExtensions.USID where Value : Swift.CustomStringConvertible {
+		return USID(rawValue: String(describing: value))
+	}
+  @inlinable public static func hash<Value>(of value: Value) -> FoundationExtensions.USID where Value : Swift.Hashable {
+		return .describing(value.hashValue)
+	}
+  @inlinable public static func dump<T>(_ value: T) -> FoundationExtensions.USID {
+		var buffer = "\(type(of: value))\n"
+		Swift.dump(value, to: &buffer)
+		return USID(rawValue: buffer)
+	}
+}
+extension Swift.String {
+  @inlinable public func usid() -> FoundationExtensions.USID { .init(self) }
+}
