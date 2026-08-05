@@ -6,7 +6,7 @@
 import Combine
 import Dispatch
 @_exported import Equated
-@_exported @preconcurrency import Foundation
+@_exported import Foundation
 @_exported import Resettable
 import Swift
 import _Concurrency
@@ -743,14 +743,6 @@ extension FoundationExtensions.Indirect : Swift.Identifiable where Value : Swift
   }
   public init(_ keyPath: Swift.KeyPath<Object, Value>)
 }
-extension Foundation.NSNotification.Name {
-  @available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
-  @_hasInitialValue public static let foundationExtensionsRuntimeWarning: Foundation.NSNotification.Name
-}
-@available(*, deprecated, message: "Use IssueReporting module from https://github.com/pointfreeco/swift-issue-reporting")
-@_transparent @inlinable @inline(__always) public func runtimeWarn(_ message: @autoclosure () -> Swift.String, category: Swift.String? = "FoundationExtensions", notificationName: Foundation.Notification.Name? = .foundationExtensionsRuntimeWarning) {
-}
-@_hasInitialValue public let isTesting: Swift.Bool
 public struct USID : Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.ExpressibleByStringLiteral, Swift.ExpressibleByStringInterpolation, Swift.LosslessStringConvertible {
   public let rawValue: Swift.String
   @inlinable public init(_ uuid: Foundation.UUID = .init()) {
