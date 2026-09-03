@@ -33,6 +33,10 @@ let package = Package(
 		.package(
 			url: "https://github.com/capturecontext/swift-associated-objects.git",
 			.upToNextMinor(from: "0.3.0")
+		),
+		.package(
+			url: "https://github.com/pointfreeco/swift-issue-reporting.git",
+			.upToNextMajor(from: "2.1.0")
 		)
 	],
 	targets: [
@@ -50,6 +54,10 @@ let package = Package(
 				.product(
 					name: "Equated",
 					package: "swift-equated"
+				),
+				.product(
+					name: "IssueReporting",
+					package: "swift-issue-reporting"
 				),
 			]
 		),

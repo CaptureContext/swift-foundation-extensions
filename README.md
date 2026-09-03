@@ -113,7 +113,7 @@ extension UIViewController {
     // https://github.com/capturecontext/combine-cocoa-navigation
     
     objc_exchangeImplementations(
-    	#selector(viewWillAppear)
+      #selector(viewWillAppear)
       #selector(__swizzledViewWillAppear)
     )
     
@@ -184,7 +184,7 @@ If you use SwiftPM for your project structure, add `swift-foundation-extensions`
 ```swift
 .package(
   url: "https://github.com/capturecontext/swift-foundation-extensions.git", 
-  .upToNextMinor("0.7.0")
+  .upToNextMinor("0.10.0")
 )
 ```
 
