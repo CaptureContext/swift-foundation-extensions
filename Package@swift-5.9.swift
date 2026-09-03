@@ -32,7 +32,7 @@ let package = Package(
 		),
 		.package(
 			url: "https://github.com/capturecontext/swift-associated-objects.git",
-			.upToNextMinor(from: "0.2.2")
+			.upToNextMinor(from: "0.3.0")
 		)
 	],
 	targets: [
