@@ -24,11 +24,11 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/capturecontext/swift-resettable.git",
-			.upToNextMinor(from: "0.3.0")
+			.upToNextMinor(from: "0.3.2")
 		),
 		.package(
 			url: "https://github.com/capturecontext/swift-equated.git",
-			.upToNextMinor(from: "0.0.2")
+			.upToNextMinor(from: "0.0.6")
 		),
 		.package(
 			url: "https://github.com/capturecontext/swift-associated-objects.git",
